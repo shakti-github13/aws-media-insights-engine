@@ -14,9 +14,6 @@ Parameters:
   DataPlaneBucket:
     Type: "String"
     Description: "Bucket for the dataplane"
-  StepfunctionRole:
-    Type: String
-    Description: "Arn of the MIE stepfunction execution role"
 
 Mappings:
     SourceCode:
@@ -30,6 +27,11 @@ Resources:
 
   TestExecutionRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Lambda requires ability to write to cloudwatch *, as configured in the default AWS lambda execution role."
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -51,9 +53,10 @@ Resources:
                 Action:
                   - states:StartExecution
                 Resource:
-                  # TODO: Security - Scope this down (should implement tagging on step functions, but this is fine for now
-                  # since we are only giving start execution access)
                   - !Join ["", ["arn:aws:states:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":stateMachine:", Ref: "AWS::StackName","*"]]
+                Condition:
+                  StringEquals:
+                    aws:ResourceTag/environment: mie
               -
                 Effect: Allow
                 Action:
@@ -62,6 +65,40 @@ Resources:
                   - logs:PutLogEvents
                 Resource:
                   - !Join ["", ["arn:aws:logs:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":log-group:/aws/lambda/*"]]
+
+  TestStepFunctionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: "sts:AssumeRole"
+            Effect: "Allow"
+            Principal:
+              Service: "states.amazonaws.com"
+      Policies:
+        - PolicyName: "MieTestStackSfnLambdaAccess"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action: "lambda:InvokeFunction"
+                Resource:
+                  - !GetAtt VideoSyncOKLambda.Arn
+                  - !GetAtt VideoSyncFailLambda.Arn
+                  - !GetAtt VideoAsyncOKLambda.Arn
+                  - !GetAtt VideoAsyncOKMonitorLambda.Arn
+                  - !GetAtt VideoAsyncFailMonitorLambda.Arn
+                  - !GetAtt AudioSyncOKLambda.Arn
+                  - !GetAtt AudioAsyncOKLambda.Arn
+                  - !GetAtt AudioAsyncOKMonitorLambda.Arn
+                  - !GetAtt ImageSyncOKLambda.Arn
+                  - !GetAtt ImageAsyncOKLambda.Arn
+                  - !GetAtt ImageAsyncOKMonitorLambda.Arn
+                  - !GetAtt TextSsyncOKLambda.Arn
+                  - !GetAtt TextAsyncOKLambda.Arn
+                  - !GetAtt TextAsyncOKMonitorLambda.Arn
+                Effect: "Allow"
+
   # Services - Lambda
 
   VideoSyncOKLambda:
@@ -387,7 +424,7 @@ Resources:
             "Enabled": true
           }
       StartLambdaArn: !GetAtt VideoSyncOKLambda.Arn
-      StateMachineExecutionRoleArn: !Ref StepfunctionRole
+      StateMachineExecutionRoleArn: !Ref TestStepFunctionRole
 
   VideoAsyncOperationCustomResource:
     Type: Custom::CustomResource
@@ -403,7 +440,7 @@ Resources:
           }
       StartLambdaArn: !GetAtt VideoAsyncOKLambda.Arn
       MonitorLambdaArn: !GetAtt VideoAsyncOKMonitorLambda.Arn
-      StateMachineExecutionRoleArn: !Ref StepfunctionRole
+      StateMachineExecutionRoleArn: !Ref TestStepFunctionRole
 
   AudioAsyncOperationCustomResource:
     Type: Custom::CustomResource
@@ -419,7 +456,7 @@ Resources:
           }
       StartLambdaArn: !GetAtt AudioAsyncOKLambda.Arn
       MonitorLambdaArn: !GetAtt AudioAsyncOKMonitorLambda.Arn
-      StateMachineExecutionRoleArn: !Ref StepfunctionRole
+      StateMachineExecutionRoleArn: !Ref TestStepFunctionRole
 
   # Build stages
 
@@ -543,7 +580,7 @@ Outputs:
   TextAsyncOKMonitorLambda:
     Value: !GetAtt TextAsyncOKMonitorLambda.Arn
   StepFunctionRole:
-     Value: !Ref StepfunctionRole
+     Value: !Ref TestStepFunctionRole
   VideoSyncOperation:
     Value: !GetAtt VideoSyncOperationCustomResource.Name
   VideoAsyncOperation:

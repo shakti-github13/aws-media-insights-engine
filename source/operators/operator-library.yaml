@@ -38,6 +38,11 @@ Resources:
 
   genericDataLookupLambdaRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Each MIE Lambda function needs permission to read/write to the dataplane bucket"
     Properties:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
@@ -66,6 +71,11 @@ Resources:
 
   mediaConvertS3Role:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Each MIE Lambda function needs permission to read/write to the dataplane bucket"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -89,6 +99,11 @@ Resources:
 
   mediaConvertLambdaRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Each MIE Lambda function needs permission to read/write to the dataplane bucket"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -179,6 +194,11 @@ Resources:
 
   captionsRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Each MIE Lambda function needs permission to read/write to the dataplane bucket"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -307,6 +327,11 @@ Resources:
 
   comprehendS3Role:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Each MIE Lambda function needs permission to read/write to the dataplane bucket"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -519,7 +544,6 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              # TODO: Security - Need to scope this down (no good answer for this yet)
               - Action: "lambda:InvokeFunction"
                 Resource:
                   - !GetAtt startGenericDataLookup.Arn

@@ -169,40 +169,13 @@ Resources:
       RetentionInDays: 14
 
   # IAM Roles
-  StepFunctionsServiceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - !Join ["", ["states.", Ref: "AWS::Region", ".amazonaws.com"]]
-            Action:
-              - sts:AssumeRole
-      Policies:
-        - PolicyName: !Sub "${AWS::StackName}-stepfunctions-service-role"
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource:
-                  - !Join [
-                    "",
-                    [
-                      "arn:aws:lambda:",
-                      Ref: "AWS::Region",
-                      ":",
-                      Ref: "AWS::AccountId",
-                      ":",
-                      "function:*",
-                    ],
-                  ]
-
   StageExecutionRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "The policy is scoped down to MIE specific resources with a condition tag"
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -328,6 +301,11 @@ Resources:
 
   OperationLambdaExecutionRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "The policy is scoped down to MIE specific resources with a condition tag"
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -458,8 +436,13 @@ Resources:
                       - WorkflowSchedulerLambda
                       - Arn
 
-  StepFunctionRole:
+  StepFunctionCreateRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Need stepfunction * to create state machine"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -473,12 +456,26 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              - Action: "lambda:InvokeFunction"
-                Resource: "arn:aws:lambda:*:*:function:*"
+              - Action:                     
+                    - "states:DescribeStateMachine"
+                    - "states:UpdateStateMachine"
+                Resource: "*"
+                Effect: "Allow"
+                Condition:
+                  StringEquals:
+                    aws:ResourceTag/environment: mie
+              - Action:                     
+                    - "states:CreateStateMachine"
+                Resource: "*"
                 Effect: "Allow"
 
   operatorFailedRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Lambda requires ability to write to cloudwatch *, as configured in the default AWS lambda execution role."
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -647,6 +644,11 @@ Resources:
   # TODO: Best Practice - S3 Bucket should have access logging configured, S3 Bucket should have encryption option set
   Dataplane:
     Type: "AWS::S3::Bucket"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W35
+            reason: "We aren't configuring access logging for this bucket"
     DeletionPolicy: Retain
     Properties:
       CorsConfiguration:
@@ -716,6 +718,11 @@ Resources:
 
   CognitoRoleMapperLambdaExecutionRole:
     Type: 'AWS::IAM::Role'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Lambda requires ability to write to cloudwatch *, as configured in the default AWS lambda execution role."
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -1220,7 +1227,7 @@ Resources:
       Parameters:
         UserPoolArn: !GetAtt MieUserPool.Arn
         StageExecutionQueueUrl: !Ref StageExecutionQueue
-        StageExecutionRole: !GetAtt StepFunctionRole.Arn
+        StageExecutionRole: !GetAtt StepFunctionCreateRole.Arn
         OperationTableName: !Ref OperationTable
         StageTableName: !Ref StageTable
         WorkflowExecutionTableName: !Ref WorkflowExecutionTable
@@ -1324,7 +1331,6 @@ Resources:
             - Outputs.APIHandlerName
         DataPlaneBucket: !Ref Dataplane
         MediaInsightsEnginePython37Layer: !Ref MediaInsightsEnginePython37Layer
-        StepfunctionRole: !GetAtt StepFunctionRole.Arn
 
   InstantTranslateWorkflow:
     Condition: DeployInstantTranslateWorkflowCondition

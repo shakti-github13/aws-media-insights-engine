@@ -99,6 +99,12 @@ Resources:
 
   WebsiteHelperRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Website helper Lambda requires ability to read / write to both MIE website bucket and MIE build bucket"
+    DependsOn: MediaInsightsWebsiteBucket
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -119,10 +125,6 @@ Resources:
                   - "s3:PutObject"
                   - "s3:ListBucket"
                 Resource:
-                  # TODO: scope this down
-                  - arn:aws:s3:::*
-                  - arn:aws:s3:::*/*
-                  # These don't seem to be sufficient unless added after stack creation
                   - !Sub
                     - arn:aws:s3:::${websitebucket}/*
                     - websitebucket: !GetAtt MediaInsightsWebsiteBucket.Arn
@@ -133,9 +135,6 @@ Resources:
                 Action:
                   - "s3:ListBucket"
                 Resource:
-                  # TODO: scope this down
-                  - arn:aws:s3:::*
-                  # These don't seem to be sufficient unless added after stack creation
                   - !Sub
                     - arn:aws:s3:::${websitebucket}
                     - websitebucket: !GetAtt MediaInsightsWebsiteBucket.Arn

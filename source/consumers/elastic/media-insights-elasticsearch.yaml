@@ -145,6 +145,11 @@ Resources:
   # TODO: Need to clean up this policy with regards to elasticsearch access
   ElasticConsumerRole:
     Type: "AWS::IAM::Role"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Lambda requires ability to write to cloudwatch *, as configured in the default AWS lambda execution role."
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17

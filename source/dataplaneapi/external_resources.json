@@ -23,6 +23,20 @@
   },
   "Resources": {
     "ApiHandlerRole": {
+      "Metadata": {
+        "cfn_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "W11",
+              "reason": "This is scoped down to just the dataplane bucket, which the api handler role needs full permission on"
+            },
+            {
+              "id": "F3",
+              "reason": "This is scoped down to just the dataplane table, which the api handler role needs full permission on"
+            }
+          ]
+        }
+      },
       "Properties": {
         "Policies": [
           {

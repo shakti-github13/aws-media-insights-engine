@@ -79,6 +79,20 @@
   },
   "Resources": {
     "ApiHandlerRole": {
+      "Metadata": {
+        "cfn_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "W11",
+              "reason": "Control plane needs stepfunction * to list, create, and tag state machines"
+            },
+            {
+              "id": "F3",
+              "reason": "This is scoped down to just the workflow api table, which the api handler role needs full permission on"
+            }
+          ]
+        }
+      },
       "Properties": {
         "Policies": [
           {
@@ -165,6 +179,16 @@
           }
         ]
       }
+    },
+    "WorkflowCustomResourceRole": {
+      "Metadata": {
+        "cfn_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "W11",
+              "reason": "Lambda needs cloudwatch"
+            }
+          ]
     },
     "WorkflowCustomResource": {
       "Properties": {
