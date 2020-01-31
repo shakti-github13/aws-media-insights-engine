@@ -77,8 +77,6 @@ dist_dir="$template_dir/dist"
 source_dir="$template_dir/../source"
 workflows_dir="$template_dir/../source/workflows"
 webapp_dir="$template_dir/../webapp"
-transcriber_dir="$template_dir/../video-transcriber"
-
 
 # Create and activate a temporary Python environment for this script.
 echo "------------------------------------------------------------------------------"
@@ -174,25 +172,10 @@ echo "--------------------------------------------------------------------------
 echo "Copy CloudFormation Templates"
 echo "------------------------------------------------------------------------------"
 
-# Instant Translate template
-echo "Copying instant translate template to dist directory"
-echo "cp $workflows_dir/instant_translate.yaml $dist_dir/instant_translate.template"
-cp "$workflows_dir/instant_translate.yaml" "$dist_dir/instant_translate.template"
-
-# Transcribe template
-echo "Copying transcribe template to dist directory"
-echo "cp $workflows_dir/transcribe.yaml $dist_dir/transcribe.template"
-cp "$workflows_dir/transcribe.yaml" "$dist_dir/transcribe.template"
-
 # Rekognition template
 echo "Copying rekognition template to dist directory"
 echo "cp $workflows_dir/rekognition.yaml $dist_dir/rekognition.template"
 cp "$workflows_dir/rekognition.yaml" "$dist_dir/rekognition.template"
-
-# Comprehend template
-echo "Copying comprehend template to dist directory"
-echo "cp $workflows_dir/comprehend.yaml $dist_dir/comprehend.template"
-cp "$workflows_dir/comprehend.yaml" "$dist_dir/comprehend.template"
 
 # Kitchen Sink template
 echo "Copying comprehend template to dist directory"
@@ -230,21 +213,6 @@ replace="s/%%VERSION%%/$2/g"
 echo "sed -i '' -e $replace $dist_dir/media-insights-stack.template"
 sed -i '' -e $replace "$dist_dir/media-insights-stack.template"
 
-# Operations template
-echo "Copying operations template to dist directory"
-echo "cp $template_dir/media-insights-test-operations-stack.yaml $dist_dir/media-insights-test-operations-stack.template"
-cp "$template_dir/media-insights-test-operations-stack.yaml" "$dist_dir/media-insights-test-operations-stack.template"
-
-echo "Updating code source bucket in operations template with '$bucket_basename'"
-replace="s/%%BUCKET_NAME%%/$bucket_basename/g"
-echo "sed -i '' -e $replace $dist_dir/media-insights-test-operations-stack.template"
-sed -i '' -e $replace "$dist_dir/media-insights-test-operations-stack.template"
-
-echo "Replacing solution version in template with '$2'"
-replace="s/%%VERSION%%/$2/g"
-echo "sed -i '' -e $replace $dist_dir/media-insights-test-operations-stack.template"
-sed -i '' -e $replace "$dist_dir/media-insights-test-operations-stack.template"
-
 # Analytics Pipeline template
 echo "Copying analytics pipeline template to dist directory"
 cp "$template_dir/media-insights-dataplane-streaming-stack.template" "$dist_dir/media-insights-dataplane-streaming-stack.template"
@@ -272,10 +240,6 @@ replace="s/%%VERSION%%/$2/g"
 echo "sed -i '' -e $replace $dist_dir/media-insights-elasticsearch.template"
 sed -i '' -e $replace "$dist_dir/media-insights-elasticsearch.template"
 
-# S3 consumer template
-echo "Copying S3 consumer template to dist directory"
-cp "$source_dir/consumers/s3/media-insights-s3.yaml" "$dist_dir/media-insights-s3.template"
-
 # Website template
 
 echo "Copying Demo Website template to dist directory"
@@ -290,21 +254,6 @@ echo "Replacing solution version in Demo Website template with '$2'"
 replace="s/%%VERSION%%/$2/g"
 echo "sed -i '' -e $replace $dist_dir/media-insights-webapp.template"
 sed -i '' -e $replace "$dist_dir/media-insights-webapp.template"
-
-# Transcriber template
-
-echo "Copying Transcriber App template to dist directory"
-cp "$transcriber_dir/cloudformation/transcriber-webapp.yaml" "$dist_dir/transcriber-webapp.template"
-
-echo "Updating code source bucket in Trancriber App template with '$bucket'"
-replace="s/%%BUCKET_NAME%%/$bucket/g"
-echo "sed -i '' -e $replace $dist_dir/transcriber-webapp.template"
-sed -i '' -e $replace "$dist_dir/transcriber-webapp.template"
-
-echo "Replacing solution version in Transcriber App template with '$2'"
-replace="s/%%VERSION%%/$2/g"
-echo "sed -i '' -e $replace $dist_dir/transcriber-webapp.template"
-sed -i '' -e $replace "$dist_dir/transcriber-webapp.template"
 
 echo "------------------------------------------------------------------------------"
 echo "Operator failed  lambda"
@@ -512,61 +461,6 @@ zip -g dist/get_transcribe.zip get_transcribe.py
 
 cp "./dist/start_transcribe.zip" "$dist_dir/start_transcribe.zip"
 cp "./dist/get_transcribe.zip" "$dist_dir/get_transcribe.zip"
-
-echo "------------------------------------------------------------------------------"
-echo "Create Captions Operations"
-echo "------------------------------------------------------------------------------"
-
-echo "Building Stage completion function"
-cd "$source_dir/operators/captions" || exit
-
-[ -e dist ] && rm -r dist
-mkdir -p dist
-
-[ -e package ] && rm -r package
-mkdir -p package
-
-echo "create requirements for lambda"
-
-#pipreqs . --force
-
-# Make lambda package
-
-pushd package
-echo "create lambda package"
-
-# Handle distutils install errors
-
-touch ./setup.cfg
-
-echo "[install]" > ./setup.cfg
-echo "prefix= " >> ./setup.cfg
-
-# Try and handle failure if pip version mismatch
-if [ -x "$(command -v pip)" ]; then
-  pip install -r ../requirements.txt --target .
-
-elif [ -x "$(command -v pip3)" ]; then
-  echo "pip not found, trying with pip3"
-  pip3 install -r ../requirements.txt --target .
-
-elif ! [ -x "$(command -v pip)" ] && ! [ -x "$(command -v pip3)" ]; then
- echo "No version of pip installed. This script requires pip. Cleaning up and exiting."
- exit 1
-fi
-
-if ! [ -d ../dist/get_captions.zip ]; then
-  zip -r9 ../dist/get_captions.zip .
-
-elif [ -d ../dist/get_captions.zip ]; then
-  echo "Package already present"
-fi
-
-popd
-
-zip -g dist/get_captions.zip get_captions.py
-
-cp "./dist/get_captions.zip" "$dist_dir/get_captions.zip"
 
 echo "------------------------------------------------------------------------------"
 echo "Translate  Operations"
@@ -1003,106 +897,6 @@ zip -g dist/websitehelper.zip *.py
 
 cp "./dist/websitehelper.zip" "$dist_dir/websitehelper.zip"
 
-#echo "------------------------------------------------------------------------------"
-#echo "Transcriber App Lambdas"
-#echo "------------------------------------------------------------------------------"
-#
-#echo "Building Transcriber App Lambdas"
-#cd "$transcriber_dir/lambda" || exit
-#
-#[ -e dist ] && rm -r dist
-#mkdir -p dist
-#
-#[ -e package ] && rm -r package
-#mkdir -p package
-#
-#echo "Create requirements for lambda"
-#
-##pipreqs . --force
-#
-## Make lambda package
-#pushd package
-#echo "Create lambda package"
-#
-## Handle distutils install errors
-#
-#touch ./setup.cfg
-#
-#echo "[install]" > ./setup.cfg
-#echo "prefix= " >> ./setup.cfg
-#
-## Try and handle failure if pip version mismatch
-#if [ -x "$(command -v pip)" ]; then
-#  pip install -r ../requirements.txt --target .
-#
-#elif [ -x "$(command -v pip3)" ]; then
-#  echo "pip not found, trying with pip3"
-#  pip3 install -r ../requirements.txt --target .
-#
-#elif ! [ -x "$(command -v pip)" ] && ! [ -x "$(command -v pip3)" ]; then
-#  echo "No version of pip installed. This script requires pip. Cleaning up and exiting."
-#  exit 1
-#fi
-#
-#zip -r9 ../dist/transcriberapp.zip .
-#
-#popd
-#
-#zip -rg dist/transcriberapp.zip *.js ../node_modules ../package.json
-#
-#cp "./dist/transcriberapp.zip" "$dist_dir/transcriberapp.zip"
-#
-#echo "------------------------------------------------------------------------------"
-#echo "Transcriber App Lambda Layer"
-#echo "------------------------------------------------------------------------------"
-#
-#echo "Building Transcriber App Lambda Layer"
-#cd "$transcriber_dir/" || exit
-#
-#npm i
-#
-#[ -e dist ] && rm -r dist
-#mkdir -p dist
-#
-#[ -e package ] && rm -r package
-#mkdir -p package
-#
-#echo "Create requirements for lambda"
-#
-##pipreqs . --force
-#
-## Make lambda package
-#pushd package
-#echo "Create lambda package"
-#
-## Handle distutils install errors
-#
-#touch ./setup.cfg
-#
-#echo "[install]" > ./setup.cfg
-#echo "prefix= " >> ./setup.cfg
-#
-## Try and handle failure if pip version mismatch
-#if [ -x "$(command -v pip)" ]; then
-#  pip install -r ../requirements.txt --target .
-#
-#elif [ -x "$(command -v pip3)" ]; then
-#  echo "pip not found, trying with pip3"
-#  pip3 install -r ../requirements.txt --target .
-#
-#elif ! [ -x "$(command -v pip)" ] && ! [ -x "$(command -v pip3)" ]; then
-#  echo "No version of pip installed. This script requires pip. Cleaning up and exiting."
-#  exit 1
-#fi
-#
-#zip -r9 ../dist/transcriber-lambda-layer.zip .
-#
-#popd
-#
-#zip -rg dist/transcriber-lambda-layer.zip node_modules/ package.json
-#
-#cp "./dist/transcriber-lambda-layer.zip" "$dist_dir/transcriber-lambda-layer.zip"
-#
 
 echo "------------------------------------------------------------------------------"
 echo "Workflow API Function"
@@ -1264,10 +1058,6 @@ do
 echo "We are uploading the MIE web app"
 
 aws s3 cp $webapp_dir/dist s3://$bucket/media-insights-solution/$2/code/website --recursive --profile $profile
-aws s3 cp $webapp_dir/.env s3://$bucket/media-insights-solution/$2/code/website/.env --profile $profile
-
-#echo "We are uploading the transcriber web app"
-#aws s3 cp $transcriber_dir/web s3://$bucket/media-insights-solution/$2/code/transcriberwebsite --recursive --profile $profile
 
 echo "------------------------------------------------------------------------------"
 echo "S3 Packaging Complete"

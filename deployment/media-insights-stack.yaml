@@ -5,47 +5,6 @@ Parameters:
   AdminEmail:
     Description: Email address for the MIE Administrator
     Type: String
-
-  DevGroupName:
-    Type: String
-    Description: Name of the developer group
-    Default: MieDevelopersGroup
-
-  DeployOperatorLibrary:
-    Description: Deploy operator library
-    Type: String
-    Default: Yes
-    AllowedValues:
-      - Yes
-      - No
-  DeployTestWorkflow:
-    Description: Deploy test workflow which contains operator, stage and workflow stubs for integration testing
-    Type: String
-    Default: No
-    AllowedValues:
-      - Yes
-      - No
-  DeployInstantTranslateWorkflow:
-    Description: Deploy Instant Translate Workflow which takes a video as input and transcribes, translates and creates an audio file in the new language
-    Type: String
-    Default: No
-    AllowedValues:
-      - Yes
-      - No
-  #  DeployTranscribeWorkflow:
-  #    Description: Deploy Transcribe Workflow which takes a video as input and transcribes
-  #    Type: String
-  #    Default: No
-  #    AllowedValues:
-  #      - Yes
-  #      - No
-  DeployAnalyticsPipeline:
-    Type: String
-    Description: Deploy a metadata streaming pipeline that can be consumed by downstream analytics plaforms
-    Default: Yes
-    AllowedValues:
-      - Yes
-      - No
   DeployDemoSite:
     Type: String
     Description: Deploy a front end application to explore extracted metadata
@@ -53,105 +12,11 @@ Parameters:
     AllowedValues:
       - Yes
       - No
-  DeployRekognitionWorkflow:
-    Description: Deploy Rekognition Workflows which takes a video as input and transcribes, translates and creates an audio file in the new language
-    Type: String
-    Default: Yes
-    AllowedValues:
-      - Yes
-      - No
-  DeployComprehendWorkflow:
-    Description: Deploy a Comprehend Workflow which takes text as input and identifies key entities and phrases
-    Type: String
-    Default: No
-    AllowedValues:
-      - Yes
-      - No
-  DeployKitchenSinkWorkflow:
-    Description: Deploy the Kitchen Sink Workflow which contains all MIE operators.
-    Type: String
-    Default: Yes
-    AllowedValues:
-      - Yes
-      - No
-  MaxConcurrentWorkflows:
-    Type: Number
-    Description: Maximum number of workflows to run concurrently.  When the maximum is reached, additional workflows are added to a wait queue.
-    Default: 10
-    MinValue: 1
-  #  TranscriberApp:
-  #    Type: String
-  #    Description: Deploy a front end transcriber application that takes custom inputs from the user
-  #    Default: No
-  #    AllowedValues:
-  #      - Yes
-  #      - No
-
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      #     -
-      #       Label:
-      #           default: Control Plane Configuration
-      #       Parameters:
-      #     -
-      #       Label:
-      #           default: Data Plane Configuration
-      #       Parameters:
-      - Label:
-          default: System Configuration
-        Parameters:
-          - AdminEmail
-          - MaxConcurrentWorkflows
-      - Label:
-          default: Operators
-        Parameters:
-          - DeployOperatorLibrary
-      - Label:
-          default: Workflows
-        Parameters:
-          - DeployTestWorkflow
-          - DeployInstantTranslateWorkflow
-          - DeployRekognitionWorkflow
-          #          - DeployTranscribeWorkflow
-          - DeployComprehendWorkflow
-          - DeployKitchenSinkWorkflow
-          - Label:
-              default: Analytics
-            Parameters:
-              - DeployAnalyticsPipeline
-      - Label:
-          default: Sample Applications
-        Parameters:
-          - DeployDemoSite
-    ParameterLabels:
-      DeployOperatorLibrary:
-        default: Enable Operator Library Deployment
-      TestWorflow:
-        default: Enable Test Workflow Deployment
-      InstantTranslateWorkflow:
-        default: Enable Instant Translate Workflow Deployment
-      #      TranscribeWorkflow:
-      #        default: Enable Transcribe Workflow Deployment
-      RekognitionWorkflow:
-        default: Enable Rekognition Workflow Deployment
 
 Conditions:
-  DeployOperatorLibraryCondition: !Equals [!Ref DeployOperatorLibrary, Yes]
-  DeployTestWorkflowCondition: !Equals [!Ref DeployTestWorkflow, Yes]
-  DeployInstantTranslateWorkflowCondition:
-    !Equals [!Ref DeployInstantTranslateWorkflow, Yes]
-  #  DeployTranscribeWorkflowCondition:
-  #  !Equals [!Ref DeployTranscribeWorkflow, Yes]
-  DeployRekognitionWorkflowCondition:
-    !Equals [!Ref DeployRekognitionWorkflow, Yes]
-  DeployComprehendWorkflowCondition:
-    !Equals [!Ref DeployComprehendWorkflow, Yes]
-  DeployKitchenSinkWorkflowCondition:
-    !Equals [!Ref DeployKitchenSinkWorkflow, Yes]
-  DeployAnalyticsPipelineCondition: !Or [!Equals [!Ref DeployAnalyticsPipeline, Yes], !Equals [!Ref DeployDemoSite, Yes]]
-  DeployDemoSiteCondition: !Equals [!Ref DeployDemoSite, Yes]
-  #DeployTranscriberApp: !Equals [!Ref TranscriberApp, Yes]
+  DeployDemoSiteCondition:
+    !Equals [!Ref DeployDemoSite, Yes]
+
 
 Mappings:
   SourceCode:
@@ -869,7 +734,7 @@ Resources:
       Description: 'User group for developers'
       RoleArn: !GetAtt MieDeveloperRole.Arn
       UserPoolId: !Ref MieUserPool
-      GroupName: !Ref DevGroupName
+      GroupName: MieDevelopersGroup
 
   MieDefaultDeveloperAccount:
     Type: AWS::Cognito::UserPoolUser
@@ -1041,7 +906,7 @@ Resources:
           WORKFLOW_EXECUTION_TABLE_NAME: !Ref WorkflowExecutionTable
           WORKFLOW_TABLE_NAME: !Ref WorkflowTable
           SYSTEM_TABLE_NAME: !Ref SystemTable
-          DEFAULT_MAX_CONCURRENT_WORKFLOWS: !Ref MaxConcurrentWorkflows
+          DEFAULT_MAX_CONCURRENT_WORKFLOWS: 10
       Handler: app.workflow_scheduler_lambda
       Code:
         S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
@@ -1185,7 +1050,6 @@ Resources:
 
   Analytics:
     Type: "AWS::CloudFormation::Stack"
-    Condition: DeployAnalyticsPipelineCondition
     DependsOn:
       - MediaInsightsWorkflowApi
       - MediaInsightsDataplaneApiStack
@@ -1267,16 +1131,7 @@ Resources:
             ],
           ]
 
-  # LambdaFunctionEventSourceMapping:
-  #   Type: AWS::Lambda::EventSourceMapping
-  #   Properties:
-  #     BatchSize: 1
-  #     Enabled: true
-  #     EventSourceArn: !GetAtt StageExecutionQueue.Arn
-  #     FunctionName: !GetAtt MediaInsightsWorkflowApi.Outputs.ExecuteStageLambdaArn
-
   OperatorLibrary:
-    Condition: DeployOperatorLibraryCondition
     DependsOn:
       - MediaInsightsWorkflowApi
       - MediaInsightsDataplaneApiStack
@@ -1302,87 +1157,7 @@ Resources:
         DataPlaneBucket: !Ref Dataplane
         MediaInsightsEnginePython37Layer: !Ref MediaInsightsEnginePython37Layer
 
-  TestWorkflow:
-    Condition: DeployTestWorkflowCondition
-    DependsOn:
-      - MediaInsightsWorkflowApi
-      - MediaInsightsDataplaneApiStack
-      - OperatorLibrary
-    Type: "AWS::CloudFormation::Stack"
-    Properties:
-      TemplateURL:
-        !Join [
-          "/",
-          [
-            "https://s3.amazonaws.com",
-            !FindInMap ["SourceCode", "General", "S3Bucket"],
-            !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
-            "media-insights-test-operations-stack.template",
-          ],
-        ]
-      Parameters:
-        WorkflowCustomResourceArn:
-          Fn::GetAtt:
-            - MediaInsightsWorkflowApi
-            - Outputs.WorkflowCustomResourceArn
-        DataplaneEndpoint:
-          Fn::GetAtt:
-            - MediaInsightsDataplaneApiStack
-            - Outputs.APIHandlerName
-        DataPlaneBucket: !Ref Dataplane
-        MediaInsightsEnginePython37Layer: !Ref MediaInsightsEnginePython37Layer
-
-  InstantTranslateWorkflow:
-    Condition: DeployInstantTranslateWorkflowCondition
-    DependsOn:
-      - MediaInsightsWorkflowApi
-      - MediaInsightsDataplaneApiStack
-      - OperatorLibrary
-    Type: "AWS::CloudFormation::Stack"
-    Properties:
-      TemplateURL:
-        !Join [
-          "/",
-          [
-            "https://s3.amazonaws.com",
-            !FindInMap ["SourceCode", "General", "S3Bucket"],
-            !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
-            "instant_translate.template",
-          ],
-        ]
-      Parameters:
-        WorkflowCustomResourceArn:
-          Fn::GetAtt:
-            - MediaInsightsWorkflowApi
-            - Outputs.WorkflowCustomResourceArn
-        OperatorLibraryStack: !GetAtt OperatorLibrary.Outputs.StackName
-
-  #  TranscribeWorkflow:
-  #    Condition: DeployTranscribeWorkflowCondition
-  #    DependsOn:
-  #      - MediaInsightsWorkflowApi
-  #      - MediaInsightsDataplaneApiStack
-  #    Type: "AWS::CloudFormation::Stack"
-  #    Properties:
-  #      TemplateURL:
-  #        !Join [
-  #          "/",
-  #          [
-  #            "https://s3.amazonaws.com",
-  #            !FindInMap ["SourceCode", "General", "S3Bucket"],
-  #            !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
-  #            "transcribe.template",
-  #          ],
-  #        ]
-  #      Parameters:
-  #        WorkflowCustomResourceArn:
-  #          Fn::GetAtt:
-  #            - MediaInsightsWorkflowApi
-  #            - Outputs.WorkflowCustomResourceArn
-  #        OperatorLibraryStack: !GetAtt OperatorLibrary.Outputs.StackName
-
   RekognitionWorkflow:
-    Condition: DeployRekognitionWorkflowCondition
     DependsOn:
       - MediaInsightsWorkflowApi
       - MediaInsightsDataplaneApiStack
@@ -1406,33 +1181,7 @@ Resources:
             - Outputs.WorkflowCustomResourceArn
         OperatorLibraryStack: !GetAtt OperatorLibrary.Outputs.StackName
 
-  ComprehendWorkflow:
-    Condition: DeployComprehendWorkflowCondition
-    DependsOn:
-      - MediaInsightsWorkflowApi
-      - MediaInsightsDataplaneApiStack
-      - OperatorLibrary
-    Type: "AWS::CloudFormation::Stack"
-    Properties:
-      TemplateURL:
-        !Join [
-          "/",
-          [
-            "https://s3.amazonaws.com",
-            !FindInMap ["SourceCode", "General", "S3Bucket"],
-            !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
-            "comprehend.template",
-          ],
-        ]
-      Parameters:
-        WorkflowCustomResourceArn:
-          Fn::GetAtt:
-            - MediaInsightsWorkflowApi
-            - Outputs.WorkflowCustomResourceArn
-        OperatorLibraryStack: !GetAtt OperatorLibrary.Outputs.StackName
-
   KitchenSinkWorkflow:
-    Condition: DeployKitchenSinkWorkflowCondition
     DependsOn:
       - MediaInsightsWorkflowApi
       - MediaInsightsDataplaneApiStack
@@ -1486,33 +1235,6 @@ Resources:
         AwsRegion: !Ref "AWS::Region"
         PoolClientId: !Ref MieWebAppClient
 
-#  TranscriberWebApp:
-#    Condition: DeployTranscriberApp
-#    DependsOn:
-#      - TranscribeWorkflow
-#    Type: "AWS::CloudFormation::Stack"
-#    Properties:
-#      TemplateURL:
-#        !Join [
-#          "/",
-#          [
-#            "https://s3.amazonaws.com",
-#            !FindInMap ["SourceCode", "General", "S3Bucket"],
-#            !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
-#            "transcriber-webapp.template",
-#          ],
-#        ]
-#      Parameters:
-#        ControlPlaneApiEndpoint:
-#          Fn::GetAtt:
-#            - MediaInsightsWorkflowApi
-#            - Outputs.EndpointURL
-#        DataPlaneApiEndpoint:
-#          Fn::GetAtt:
-#            - MediaInsightsDataplaneApiStack
-#            - Outputs.EndpointURL
-#        DataPlaneBucket: !Ref DataplaneBucket
-
 Outputs:
   DataplaneBucket:
     Description: Bucket used to store transfomred media object from workflow execution
@@ -1539,7 +1261,6 @@ Outputs:
     Description: Url of the Media Insights Engine sample web application
     Value: !GetAtt MediaInsightsWebApp.Outputs.CloudfrontUrl
   ElasticsearchEndpoint:
-    Condition: DeployAnalyticsPipelineCondition
     Description: Endpoint for elasticsearch cluster
     Value: !GetAtt Analytics.Outputs.ElasticUrl
   MediaInsightsEnginePython37Layer:

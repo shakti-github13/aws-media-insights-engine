@@ -192,41 +192,6 @@ Resources:
                 Resource: !Ref DataPlaneHandlerArn
                 Effect: "Allow"
 
-  captionsRole:
-    Type: "AWS::IAM::Role"
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W11
-            reason: "Each MIE Lambda function needs permission to read/write to the dataplane bucket"
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Action: "sts:AssumeRole"
-            Effect: "Allow"
-            Principal:
-              Service: "lambda.amazonaws.com"
-      Policies:
-        - PolicyName: "CaptionsAccess"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Action:
-                - "logs:CreateLogGroup"
-                - "logs:CreateLogStream"
-                - "logs:PutLogEvents"
-                Resource: "arn:aws:logs:*:*:*:*"
-                Effect: Allow
-              - Action:
-                - "s3:GetObject"
-                - "s3:PutObject"
-                Resource: !Sub "arn:aws:s3:::${DataPlaneBucket}/*"
-                Effect: "Allow"
-              - Action: "lambda:InvokeFunction"
-                Resource: !Ref DataPlaneHandlerArn
-                Effect: "Allow"
-
   translateRole:
     Type: "AWS::IAM::Role"
     Metadata:
@@ -572,11 +537,6 @@ Resources:
                   - !GetAtt CheckMediaConvertFunction.Arn
                   - !GetAtt StartTranscribeFunction.Arn
                   - !GetAtt CheckTranscribeFunction.Arn
-                  - !GetAtt WebCaptionsFunction.Arn
-                  - !GetAtt CreateSRTCaptionsFunction.Arn
-                  - !GetAtt CreateVTTCaptionsFunction.Arn
-                  - !GetAtt WebToSRTCaptionsFunction.Arn
-                  - !GetAtt WebToVTTCaptionsFunction.Arn
                   - !GetAtt TranslateFunction.Arn
                   - !GetAtt StartPollyFunction.Arn
                   - !GetAtt CheckPollyFunction.Arn
@@ -1179,130 +1139,6 @@ Resources:
           DATAPLANE_BUCKET: !Ref "DataPlaneBucket"
           botoConfig: '{"user_agent": "aws-tm-mie/python3.7/lambda"}'
 
-  # Create Web Captions Lambda
-
-  WebCaptionsFunction:
-    Type: "AWS::Lambda::Function"
-    Properties:
-      Handler: "get_captions.web_captions"
-      Layers:
-        - !Ref "MediaInsightsEnginePython37Layer"
-      Role: !GetAtt "captionsRole.Arn"
-      Code:
-        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
-        S3Key:
-          !Join [
-            "/",
-            [
-            !FindInMap ["SourceCode", "General", "KeyPrefix"],
-            "get_captions.zip",
-            ],
-          ]
-      Runtime: "python3.7"
-      Timeout: 300
-      Environment:
-        Variables:
-          DataplaneEndpoint: !Ref "DataPlaneEndpoint"
-          DATAPLANE_BUCKET: !Ref "DataPlaneBucket"
-
-  # Create Time Series Lambda
-
-  CreateSRTCaptionsFunction:
-    Type: "AWS::Lambda::Function"
-    Properties:
-      Handler: "get_captions.create_srt"
-      Layers:
-        - !Ref "MediaInsightsEnginePython37Layer"
-      Role: !GetAtt "captionsRole.Arn"
-      Code:
-        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
-        S3Key:
-          !Join [
-            "/",
-            [
-            !FindInMap ["SourceCode", "General", "KeyPrefix"],
-            "get_captions.zip",
-            ],
-          ]
-      Runtime: "python3.7"
-      Timeout: 300
-      Environment:
-        Variables:
-          DataplaneEndpoint: !Ref "DataPlaneEndpoint"
-          DATAPLANE_BUCKET: !Ref "DataPlaneBucket"
-
-  CreateVTTCaptionsFunction:
-    Type: "AWS::Lambda::Function"
-    Properties:
-      Handler: "get_captions.create_vtt"
-      Layers:
-        - !Ref "MediaInsightsEnginePython37Layer"
-      Role: !GetAtt "captionsRole.Arn"
-      Code:
-        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
-        S3Key:
-          !Join [
-            "/",
-            [
-            !FindInMap ["SourceCode", "General", "KeyPrefix"],
-            "get_captions.zip",
-            ],
-          ]
-      Runtime: "python3.7"
-      Timeout: 300
-      Environment:
-        Variables:
-          DataplaneEndpoint: !Ref "DataPlaneEndpoint"
-          DATAPLANE_BUCKET: !Ref "DataPlaneBucket"
-
-  WebToSRTCaptionsFunction:
-    Type: "AWS::Lambda::Function"
-    Properties:
-      Handler: "get_captions.web_to_srt"
-      Layers:
-        - !Ref "MediaInsightsEnginePython37Layer"
-      Role: !GetAtt "captionsRole.Arn"
-      Code:
-        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
-        S3Key:
-          !Join [
-            "/",
-            [
-            !FindInMap ["SourceCode", "General", "KeyPrefix"],
-            "get_captions.zip",
-            ],
-          ]
-      Runtime: "python3.7"
-      Timeout: 300
-      Environment:
-        Variables:
-          DataplaneEndpoint: !Ref "DataPlaneEndpoint"
-          DATAPLANE_BUCKET: !Ref "DataPlaneBucket"
-
-  WebToVTTCaptionsFunction:
-    Type: "AWS::Lambda::Function"
-    Properties:
-      Handler: "get_captions.web_to_vtt"
-      Layers:
-        - !Ref "MediaInsightsEnginePython37Layer"
-      Role: !GetAtt "captionsRole.Arn"
-      Code:
-        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
-        S3Key:
-          !Join [
-            "/",
-            [
-            !FindInMap ["SourceCode", "General", "KeyPrefix"],
-            "get_captions.zip",
-            ],
-          ]
-      Runtime: "python3.7"
-      Timeout: 300
-      Environment:
-        Variables:
-          DataplaneEndpoint: !Ref "DataPlaneEndpoint"
-          DATAPLANE_BUCKET: !Ref "DataPlaneBucket"
-
   # Translate Lambdas
 
   TranslateFunction:
@@ -1428,61 +1264,6 @@ Resources:
         { "TranscribeLanguage": "en-US", "MediaType": "Audio", "Enabled": true }
       StartLambdaArn: !GetAtt StartTranscribeFunction.Arn
       MonitorLambdaArn: !GetAtt CheckTranscribeFunction.Arn
-      StateMachineExecutionRoleArn: !GetAtt StepFunctionRole.Arn
-
-  WebCaptionsOperation:
-    Type: Custom::CustomResource
-    Properties:
-      ServiceToken: !Ref WorkflowCustomResourceArn
-      ResourceType: "Operation"
-      Name: "WebCaptions"
-      Type: "Sync"
-      Configuration: { "MediaType": "Text", "Enabled": true }
-      StartLambdaArn: !GetAtt WebCaptionsFunction.Arn
-      StateMachineExecutionRoleArn: !GetAtt StepFunctionRole.Arn
-
-  CreateSRTCaptionsOperation:
-    Type: Custom::CustomResource
-    Properties:
-      ServiceToken: !Ref WorkflowCustomResourceArn
-      ResourceType: "Operation"
-      Name: "CreateSRTCaptions"
-      Type: "Sync"
-      Configuration: { "MediaType": "Text", "Enabled": true }
-      StartLambdaArn: !GetAtt CreateSRTCaptionsFunction.Arn
-      StateMachineExecutionRoleArn: !GetAtt StepFunctionRole.Arn
-
-  CreateVTTCaptionsOperation:
-    Type: Custom::CustomResource
-    Properties:
-      ServiceToken: !Ref WorkflowCustomResourceArn
-      ResourceType: "Operation"
-      Name: "CreateVTTCaptions"
-      Type: "Sync"
-      Configuration: { "MediaType": "Text", "Enabled": true }
-      StartLambdaArn: !GetAtt CreateVTTCaptionsFunction.Arn
-      StateMachineExecutionRoleArn: !GetAtt StepFunctionRole.Arn
-
-  WebToSRTCaptionsOperation:
-    Type: Custom::CustomResource
-    Properties:
-      ServiceToken: !Ref WorkflowCustomResourceArn
-      ResourceType: "Operation"
-      Name: "WebToSRTCaptions"
-      Type: "Sync"
-      Configuration: { "MediaType": "MetadataOnly", "Enabled": true }
-      StartLambdaArn: !GetAtt WebToSRTCaptionsFunction.Arn
-      StateMachineExecutionRoleArn: !GetAtt StepFunctionRole.Arn
-
-  WebToVTTCaptionsOperation:
-    Type: Custom::CustomResource
-    Properties:
-      ServiceToken: !Ref WorkflowCustomResourceArn
-      ResourceType: "Operation"
-      Name: "WebToVTTCaptions"
-      Type: "Sync"
-      Configuration: { "MediaType": "MetadataOnly", "Enabled": true }
-      StartLambdaArn: !GetAtt WebToVTTCaptionsFunction.Arn
       StateMachineExecutionRoleArn: !GetAtt StepFunctionRole.Arn
 
   TranslateOperation:
@@ -1688,31 +1469,6 @@ Outputs:
     Value: !GetAtt TranscribeOperation.Name
     Export:
       Name: !Join [":", [!Ref "AWS::StackName", Transcribe]]
-  WebCaptionsOperation:
-    Description: "Operation to create web captions"
-    Value: !GetAtt WebCaptionsOperation.Name
-    Export:
-      Name: !Join [":", [!Ref "AWS::StackName", WebCaptions]]
-  CreateSRTCaptionsOperation:
-    Description: "Operation to create SRT captions"
-    Value: !GetAtt CreateSRTCaptionsOperation.Name
-    Export:
-      Name: !Join [":", [!Ref "AWS::StackName", CreateSRTCaptions]]
-  CreateVTTCaptionsOperation:
-    Description: "Operation to create VTT captions"
-    Value: !GetAtt CreateVTTCaptionsOperation.Name
-    Export:
-      Name: !Join [":", [!Ref "AWS::StackName", CreateVTTCaptions]]
-  WebToSRTCaptionsOperation:
-    Description: "Operation to convert web captions to SRT format"
-    Value: !GetAtt WebToSRTCaptionsOperation.Name
-    Export:
-      Name: !Join [":", [!Ref "AWS::StackName", WebToSRTCaptions]]
-  WebToVTTCaptionsOperation:
-    Description: "Operation to convert web captions to VTT format"
-    Value: !GetAtt WebToVTTCaptionsOperation.Name
-    Export:
-      Name: !Join [":", [!Ref "AWS::StackName", WebToVTTCaptions]]
   TranslateOperation:
     Description: "Operation name of translate"
     Value: !GetAtt TranslateOperation.Name
