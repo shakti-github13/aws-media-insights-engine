@@ -532,6 +532,10 @@ Resources:
   StepFunctionRole:
     Type: "AWS::IAM::Role"
     Properties:
+      Tags:
+        - 
+          Key: "environment"
+          Value: "mie"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:

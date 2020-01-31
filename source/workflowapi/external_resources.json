@@ -181,14 +181,107 @@
       }
     },
     "WorkflowCustomResourceRole": {
+      "Properties": {
+        "Policies": [
+          {
+            "PolicyName": "MieWorkflowCustomResourceRolePolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow",
+                  "Sid": "Logging"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "iam:PassRole",
+                  "Resource": "*",
+                  "Condition": {
+                      "StringEquals": {
+                          "iam:ResourceTag/environment": "mie"
+                      }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "iam:PassRole"
+                  ],
+                  "Resource": {"Ref": "StageExecutionRole"}
+                },  
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:*"
+                  ],
+                  "Resource": {"Ref": "SqsQueueArn"}
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "dynamodb:*",
+                  "Resource": [
+                    {"Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SystemTableName}"},
+                    {"Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${WorkflowTableName}"},
+                    {"Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${WorkflowExecutionTableName}"},
+                    {"Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${WorkflowExecutionTableName}/*"},
+                    {"Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${HistoryTableName}"},
+                    {"Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${OperationTableName}"},
+                    {"Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${StageTableName}"}
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:ListStateMachines",
+                    "states:TagResource",
+                    "states:CreateStateMachine"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:DescribeStateMachine",
+                    "states:UpdateStateMachine",
+                    "states:DeleteStateMachine",
+                    "states:UntagResource"
+                  ],
+                  "Resource": "*",
+                  "Condition": {
+                    "StringEquals": {
+                        "aws:ResourceTag/environment": "mie"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
       "Metadata": {
         "cfn_nag": {
           "rules_to_suppress": [
             {
               "id": "W11",
-              "reason": "Lambda needs cloudwatch"
+              "reason": "Lambda needs cloudwatch *, IAM * passrole requires IAM resource tag, stepfunctions requires * for create."
+            },
+            {
+              "id": "F3",
+              "reason": "IAM * passrole is mitigated by requiring IAM resource tag"
+            },
+            {
+              "id": "F38",
+              "reason": "IAM * passrole is mitigated by requiring IAM resource tag"
             }
           ]
+        }
+      }
     },
     "WorkflowCustomResource": {
       "Properties": {

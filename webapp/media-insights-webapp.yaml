@@ -125,22 +125,18 @@ Resources:
                   - "s3:PutObject"
                   - "s3:ListBucket"
                 Resource:
-                  - !Sub
-                    - arn:aws:s3:::${websitebucket}/*
-                    - websitebucket: !GetAtt MediaInsightsWebsiteBucket.Arn
-                  - !Sub
-                    - arn:aws:s3:::${websitecode}/*
-                    - websitecode: !FindInMap ["SourceCode", "General", "S3Bucket"]
+                  - !Sub ${MediaInsightsWebsiteBucket.Arn}/*
+                  - Fn::Sub:
+                      - arn:aws:s3:::${websitecode}/*
+                      - websitecode: !FindInMap ["SourceCode", "General", "S3Bucket"]
               - Effect: Allow
                 Action:
                   - "s3:ListBucket"
                 Resource:
-                  - !Sub
-                    - arn:aws:s3:::${websitebucket}
-                    - websitebucket: !GetAtt MediaInsightsWebsiteBucket.Arn
-                  - !Sub
-                    - arn:aws:s3:::${websitecode}
-                    - websitecode: !FindInMap ["SourceCode", "General", "S3Bucket"]
+                  - !Sub ${MediaInsightsWebsiteBucket.Arn}
+                  - Fn::Sub:
+                      - arn:aws:s3:::${websitecode}
+                      - websitecode: !FindInMap ["SourceCode", "General", "S3Bucket"]
               - Effect: Allow
                 Action:
                   - "logs:CreateLogGroup"

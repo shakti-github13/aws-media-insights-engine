@@ -69,6 +69,10 @@ Resources:
   TestStepFunctionRole:
     Type: "AWS::IAM::Role"
     Properties:
+      Tags:
+        - 
+          Key: "environment"
+          Value: "mie"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -94,7 +98,7 @@ Resources:
                   - !GetAtt ImageSyncOKLambda.Arn
                   - !GetAtt ImageAsyncOKLambda.Arn
                   - !GetAtt ImageAsyncOKMonitorLambda.Arn
-                  - !GetAtt TextSsyncOKLambda.Arn
+                  - !GetAtt TextSyncOKLambda.Arn
                   - !GetAtt TextAsyncOKLambda.Arn
                   - !GetAtt TextAsyncOKMonitorLambda.Arn
                 Effect: "Allow"
