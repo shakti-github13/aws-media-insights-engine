@@ -1266,16 +1266,17 @@ def create_workflow(trigger, workflow):
         # Validate inputs
 
         checkRequiredInput("Name", workflow, "Workflow Definition")
+        checkRequiredInput("RoleArn", workflow, "Workflow Definition")
         checkRequiredInput("StartAt", workflow, "Workflow Definition")
         checkRequiredInput("Stages", workflow, "Workflow Definition")
 
         workflow = build_workflow(workflow)
-            
+        
         # Build state machine
         response = SFN_CLIENT.create_state_machine(
             name=workflow["Name"],
             definition=json.dumps(workflow["WorkflowAsl"]),
-            roleArn=STAGE_EXECUTION_ROLE,
+            roleArn=workflow["RoleArn"],
             tags=[
                 {
                     'key': 'environment',
@@ -1501,6 +1502,9 @@ def update_workflow(trigger, new_workflow):
 
         if "Stages" in new_workflow:
             workflow["Stages"] = new_workflow["Stages"]
+        
+        if "RoleArn" in new_workflow:
+            workflow["RoleArn"] = new_workflow["RoleArn"]
 
         logger.info(json.dumps(workflow))
 
@@ -1512,7 +1516,7 @@ def update_workflow(trigger, new_workflow):
         response = SFN_CLIENT.update_state_machine(
             stateMachineArn=workflow["StateMachineArn"],
             definition=json.dumps(workflow["WorkflowAsl"]),
-            roleArn=STAGE_EXECUTION_ROLE
+            roleArn=workflow["RoleArn"]
         )    
 
         # We saved the Asl in the state machine and we can generate it too. declutter.

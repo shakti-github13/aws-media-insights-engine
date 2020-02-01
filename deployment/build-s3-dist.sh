@@ -182,22 +182,6 @@ echo "Copying comprehend template to dist directory"
 echo "cp $workflows_dir/MieCompleteWorkflow.yaml $dist_dir/MieCompleteWorkflow.template"
 cp "$workflows_dir/MieCompleteWorkflow.yaml" "$dist_dir/MieCompleteWorkflow.template"
 
-# Operator library template
-echo "Copying operator library template to dist directory"
-echo "cp $source_dir/operators/operator-library.yaml $dist_dir/media-insights-operator-library.template"
-cp "$source_dir/operators/operator-library.yaml" "$dist_dir/media-insights-operator-library.template"
-
-echo "Updating code source bucket in operator library template with '$bucket'"
-replace="s/%%BUCKET_NAME%%/$bucket/g"
-echo "sed -i '' -e $replace $dist_dir/media-insights-operator-library.template"
-sed -i '' -e $replace "$dist_dir/media-insights-operator-library.template"
-
-echo "Replacing solution version in operator library template with '$2'"
-replace="s/%%VERSION%%/$2/g"
-echo "sed -i '' -e $replace $dist_dir/media-insights-operator-library.template"
-sed -i '' -e $replace "$dist_dir/media-insights-operator-library.template"
-
-
 # Workflow template
 echo "Copying workflow template to dist directory"
 echo "cp $template_dir/media-insights-stack.yaml $dist_dir/media-insights-stack.template"
@@ -961,65 +945,6 @@ cp dist/dataplaneapi.json $dist_dir/media-insights-dataplane-api-stack.template
 
 echo "cp ./dist/deployment.zip $dist_dir/dataplaneapi.zip"
 cp ./dist/deployment.zip $dist_dir/dataplaneapi.zip
-
-
-echo "------------------------------------------------------------------------------"
-echo "Test operators"
-echo "------------------------------------------------------------------------------"
-
-echo "Building test operators"
-cd "$source_dir/operators/test" || exit
-
-[ -e dist ] && rm -r dist
-mkdir -p dist
-
-[ -e package ] && rm -r package
-mkdir -p package
-
-echo "create requirements for lambda"
-
-#pipreqs . --force
-
-# Make lambda package
-
-pushd package
-echo "create lambda package"
-
-# Handle distutils install errors
-
-touch ./setup.cfg
-
-echo "[install]" > ./setup.cfg
-echo "prefix= " >> ./setup.cfg
-
-# Try and handle failure if pip version mismatch
-if [ -x "$(command -v pip)" ]; then
-  pip install -r ../requirements.txt --target .
-
-elif [ -x "$(command -v pip3)" ]; then
-  echo "pip not found, trying with pip3"
-  pip3 install -r ../requirements.txt --target .
-
-elif ! [ -x "$(command -v pip)" ] && ! [ -x "$(command -v pip3)" ]; then
- echo "No version of pip installed. This script requires pip. Cleaning up and exiting."
- exit 1
-fi
-
-if ! [ -d ../dist/test_operations.zip ]; then
-  echo "test_operations.zip zip file doesn't exist"
-  zip -r9 ../dist/test_operations.zip .
-
-elif [ -d ../dist/test_operations.zip ]; then
-  echo "test_operations.zip Package already present"
-
-fi
-
-popd
-
-zip -g dist/test_operations.zip *.py
-
-echo "copy echo test_operations.zip to dist_dir"
-cp "./dist/test_operations.zip" "$dist_dir/test_operations.zip"
 
 echo "------------------------------------------------------------------------------"
 echo "Build vue website "
