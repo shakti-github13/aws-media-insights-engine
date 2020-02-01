@@ -1614,6 +1614,7 @@ Resources:
                   - !GetAtt StartPollyFunction.Arn
                   - !GetAtt CheckPollyFunction.Arn
                   - !GetAtt FilterOperationLambda.Arn
+                  - !GetAtt CompleteStageLambda.Arn
                 Effect: "Allow"
 
   # Lambda functions
