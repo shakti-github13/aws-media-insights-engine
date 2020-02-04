@@ -5,12 +5,35 @@ Parameters:
   WorkflowCustomResourceArn:
     Type: String
     Description: "ARN of the Media Insights custom resource that handles creating operations, stages and workflows"
-  # FIXME - this doesn't work well with nesting - just pass in the layer resource
-  # MediaInsightsWorkflowStack:
-    # Description: "Name of the base media insights workflow stack"
-    # Type: String
-  OperatorLibraryStack:
-    Description: "Name of the operator library stack"
+  StepfunctionRoleArn:
+    Type: String
+  GenericDataLookup:
+    Type: String
+  CelebRecognition:
+    Type: String
+  ContentModeration:
+    Type: String
+  FaceDetection:
+    Type: String
+  FaceSearch:
+    Type: String
+  LabelDetection:
+    Type: String
+  PersonTracking:
+    Type: String
+  Mediaconvert:
+    Type: String
+  Thumbnail:
+    Type: String
+  Transcribe:
+    Type: String
+  Translate:
+    Type: String
+  ComprehendPhrases:
+    Type: String
+  ComprehendEntities:
+    Type: String
+  Polly:
     Type: String
 
 Resources:
@@ -21,25 +44,16 @@ Resources:
       ResourceType: "Stage"
       Name: "defaultVideoStage"
       Operations:
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:GenericDataLookup"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:CelebRecognition"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:ContentModeration"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:FaceDetection"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:FaceSearch"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:LabelDetection"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:PersonTracking"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:Mediaconvert"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:Thumbnail"
-
+        - !Ref GenericDataLookup
+        - !Ref CelebRecognition
+        - !Ref ContentModeration
+        - !Ref FaceDetection
+        - !Ref FaceSearch
+        - !Ref LabelDetection
+        - !Ref PersonTracking
+        - !Ref Mediaconvert
+        - !Ref Thumbnail
+  
   defaultAudioStage:
     Type: Custom::CustomResource
     Properties:
@@ -47,8 +61,7 @@ Resources:
       ResourceType: "Stage"
       Name: "defaultAudioStage"
       Operations:
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:Transcribe"
+        - !Ref Transcribe
 
   defaultTextStage:
     Type: Custom::CustomResource
@@ -57,12 +70,9 @@ Resources:
       ResourceType: "Stage"
       Name: "defaultTextStage"
       Operations:
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:Translate"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:ComprehendPhrases"
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:ComprehendEntities"
+        - !Ref Translate
+        - !Ref ComprehendPhrases
+        - !Ref ComprehendEntities
 
   defaultTextSynthesisStage:
     Type: Custom::CustomResource
@@ -71,8 +81,7 @@ Resources:
       ResourceType: "Stage"
       Name: "defaultTextSynthesisStage"
       Operations:
-        - Fn::ImportValue:
-            Fn::Sub: "${OperatorLibraryStack}:Polly"
+        - !Ref Polly
 
   MieCompleteWorkflow:
     DependsOn:
@@ -85,6 +94,7 @@ Resources:
       ServiceToken: !Ref WorkflowCustomResourceArn
       ResourceType: "Workflow"
       Name: "MieCompleteWorkflow"
+      RoleArn: !Ref StepfunctionRoleArn
       StartAt: !GetAtt defaultVideoStage.Name
       Stages: !Sub
         - |-

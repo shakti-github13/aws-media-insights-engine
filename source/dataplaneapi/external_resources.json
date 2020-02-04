@@ -23,6 +23,20 @@
   },
   "Resources": {
     "ApiHandlerRole": {
+      "Metadata": {
+        "cfn_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "W11",
+              "reason": "This is scoped down to just the dataplane bucket, which the api handler role needs full permission on"
+            },
+            {
+              "id": "F3",
+              "reason": "This is scoped down to just the dataplane table, which the api handler role needs full permission on"
+            }
+          ]
+        }
+      },
       "Properties": {
         "Policies": [
           {
@@ -32,9 +46,19 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "s3:*"
+                    "s3:ReplicateObject",
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:RestoreObject",
+                    "s3:GetObjectVersionAcl",
+                    "s3:ListBucket",
+                    "s3:DeleteObject",
+                    "s3:HeadBucket",
+                    "s3:PutObjectAcl",
+                    "s3:GetObjectVersion",
+                    "s3:DeleteObjectVersion"
                   ],
-                  "Resource": "*"
+                  "Resource": {"Fn::Sub": "arn:aws:s3:::${DataplaneBucketName}/*"}
                 },
                 {
                   "Effect": "Allow",
