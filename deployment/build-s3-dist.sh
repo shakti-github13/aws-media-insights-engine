@@ -182,10 +182,8 @@ echo "--------------------------------------------------------------------------
 echo "Preparing template files:"
 cp "$template_dir/media-insights-stack.yaml" "$dist_dir/media-insights-stack.template"
 cp "$template_dir/media-insights-dataplane-streaming-stack.template" "$dist_dir/media-insights-dataplane-streaming-stack.template"
-cp "$source_dir/operators/operator-library.yaml" "$dist_dir/media-insights-operator-library.template"
 cp "$workflows_dir/rekognition.yaml" "$dist_dir/rekognition.template"
 cp "$workflows_dir/MieCompleteWorkflow.yaml" "$dist_dir/MieCompleteWorkflow.template"
-cp "$source_dir/consumers/s3/media-insights-s3.yaml" "$dist_dir/media-insights-s3.template"
 cp "$source_dir/consumers/elastic/media-insights-elasticsearch.yaml" "$dist_dir/media-insights-elasticsearch.template"
 cp "$webapp_dir/media-insights-webapp.yaml" "$dist_dir/media-insights-webapp.template"
 
@@ -200,8 +198,6 @@ sed -i.orig -e $new_bucket "$dist_dir/media-insights-stack.template"
 sed -i.orig -e $new_version "$dist_dir/media-insights-stack.template"
 sed -i.orig -e $new_bucket "$dist_dir/media-insights-dataplane-streaming-stack.template"
 sed -i.orig -e $new_version "$dist_dir/media-insights-dataplane-streaming-stack.template"
-sed -i.orig -e $new_bucket "$dist_dir/media-insights-operator-library.template"
-sed -i.orig -e $new_version "$dist_dir/media-insights-operator-library.template"
 sed -i.orig -e $new_bucket "$dist_dir/media-insights-elasticsearch.template"
 sed -i.orig -e $new_version "$dist_dir/media-insights-elasticsearch.template"
 sed -i.orig -e $new_bucket "$dist_dir/media-insights-webapp.template"
@@ -856,23 +852,6 @@ if ! [ -x "$(command -v chalice)" ]; then
   echo 'Chalice is not installed. It is required for this solution. Exiting.'
   exit 1
 fi
-
-# Make sure the MIE lambda help module is found.
-echo "DEBUG: can we find the MIE lambda helper module?"
-echo "PYTHONPATH: "
-echo $PYTHONPATH
-
-echo 'DEBUG: python3 -c "import sys; print(sys.path)"'
-python3 -c "import sys; print(sys.path)"
-
-echo 'DEBUG: pip list'
-pip list
-
-echo 'DEBUG: pip show Media-Insights-Engine-Lambda-Helper'
-pip show Media-Insights-Engine-Lambda-Helper
-
-echo 'DEBUG: python3 -c "from MediaInsightsEngineLambdaHelper import DataPlane"'
-python3 -c "from MediaInsightsEngineLambdaHelper import DataPlane"
 
 echo "running chalice..."
 chalice package --merge-template external_resources.json dist
