@@ -182,12 +182,8 @@ echo "--------------------------------------------------------------------------
 echo "Preparing template files:"
 cp "$template_dir/media-insights-stack.yaml" "$dist_dir/media-insights-stack.template"
 cp "$template_dir/media-insights-dataplane-streaming-stack.template" "$dist_dir/media-insights-dataplane-streaming-stack.template"
-cp "$template_dir/media-insights-test-operations-stack.yaml" "$dist_dir/media-insights-test-operations-stack.template"
 cp "$source_dir/operators/operator-library.yaml" "$dist_dir/media-insights-operator-library.template"
-cp "$workflows_dir/instant_translate.yaml" "$dist_dir/instant_translate.template"
-cp "$workflows_dir/transcribe.yaml" "$dist_dir/transcribe.template"
 cp "$workflows_dir/rekognition.yaml" "$dist_dir/rekognition.template"
-cp "$workflows_dir/comprehend.yaml" "$dist_dir/comprehend.template"
 cp "$workflows_dir/MieCompleteWorkflow.yaml" "$dist_dir/MieCompleteWorkflow.template"
 cp "$source_dir/consumers/s3/media-insights-s3.yaml" "$dist_dir/media-insights-s3.template"
 cp "$source_dir/consumers/elastic/media-insights-elasticsearch.yaml" "$dist_dir/media-insights-elasticsearch.template"
@@ -204,8 +200,6 @@ sed -i.orig -e $new_bucket "$dist_dir/media-insights-stack.template"
 sed -i.orig -e $new_version "$dist_dir/media-insights-stack.template"
 sed -i.orig -e $new_bucket "$dist_dir/media-insights-dataplane-streaming-stack.template"
 sed -i.orig -e $new_version "$dist_dir/media-insights-dataplane-streaming-stack.template"
-sed -i.orig -e $new_bucket "$dist_dir/media-insights-test-operations-stack.template"
-sed -i.orig -e $new_version "$dist_dir/media-insights-test-operations-stack.template"
 sed -i.orig -e $new_bucket "$dist_dir/media-insights-operator-library.template"
 sed -i.orig -e $new_version "$dist_dir/media-insights-operator-library.template"
 sed -i.orig -e $new_bucket "$dist_dir/media-insights-elasticsearch.template"
@@ -414,60 +408,6 @@ zip -q -g dist/get_transcribe.zip get_transcribe.py
 
 cp "./dist/start_transcribe.zip" "$dist_dir/start_transcribe.zip"
 cp "./dist/get_transcribe.zip" "$dist_dir/get_transcribe.zip"
-
-echo "------------------------------------------------------------------------------"
-echo "Create Captions Operations"
-echo "------------------------------------------------------------------------------"
-
-cd "$source_dir/operators/captions" || exit 1
-
-[ -e dist ] && rm -r dist
-mkdir -p dist
-
-[ -e package ] && rm -r package
-mkdir -p package
-
-echo "create requirements for lambda"
-
-#pipreqs . --force
-
-# Make lambda package
-
-pushd package
-echo "create lambda package"
-
-# Handle distutils install errors
-
-touch ./setup.cfg
-
-echo "[install]" > ./setup.cfg
-echo "prefix= " >> ./setup.cfg
-
-# Try and handle failure if pip version mismatch
-if [ -x "$(command -v pip)" ]; then
-  pip install --quiet -r ../requirements.txt --target .
-
-elif [ -x "$(command -v pip3)" ]; then
-  echo "pip not found, trying with pip3"
-  pip3 install --quiet -r ../requirements.txt --target .
-
-elif ! [ -x "$(command -v pip)" ] && ! [ -x "$(command -v pip3)" ]; then
- echo "No version of pip installed. This script requires pip. Cleaning up and exiting."
- exit 1
-fi
-
-if ! [ -d ../dist/get_captions.zip ]; then
-  zip -q -r9 ../dist/get_captions.zip .
-
-elif [ -d ../dist/get_captions.zip ]; then
-  echo "Package already present"
-fi
-
-popd
-
-zip -q -g dist/get_captions.zip get_captions.py
-
-cp "./dist/get_captions.zip" "$dist_dir/get_captions.zip"
 
 echo "------------------------------------------------------------------------------"
 echo "Translate Operations"
@@ -979,65 +919,6 @@ cp dist/dataplaneapi.json $dist_dir/media-insights-dataplane-api-stack.template
 
 echo "cp ./dist/deployment.zip $dist_dir/dataplaneapi.zip"
 cp ./dist/deployment.zip $dist_dir/dataplaneapi.zip
-
-
-echo "------------------------------------------------------------------------------"
-echo "Test operators"
-echo "------------------------------------------------------------------------------"
-
-echo "Building test operators"
-cd "$source_dir/operators/test" || exit 1
-
-[ -e dist ] && rm -r dist
-mkdir -p dist
-
-[ -e package ] && rm -r package
-mkdir -p package
-
-echo "create requirements for lambda"
-
-#pipreqs . --force
-
-# Make lambda package
-
-pushd package
-echo "create lambda package"
-
-# Handle distutils install errors
-
-touch ./setup.cfg
-
-echo "[install]" > ./setup.cfg
-echo "prefix= " >> ./setup.cfg
-
-# Try and handle failure if pip version mismatch
-if [ -x "$(command -v pip)" ]; then
-  pip install --quiet -r ../requirements.txt --target .
-
-elif [ -x "$(command -v pip3)" ]; then
-  echo "pip not found, trying with pip3"
-  pip3 install --quiet -r ../requirements.txt --target .
-
-elif ! [ -x "$(command -v pip)" ] && ! [ -x "$(command -v pip3)" ]; then
-  echo "No version of pip installed. This script requires pip. Cleaning up and exiting."
-  exit 1
-fi
-
-if ! [ -d ../dist/test_operations.zip ]; then
-  echo "test_operations.zip zip file doesn't exist"
-  zip -q -r9 ../dist/test_operations.zip .
-
-elif [ -d ../dist/test_operations.zip ]; then
-  echo "test_operations.zip Package already present"
-
-fi
-
-popd
-
-zip -q -g dist/test_operations.zip *.py
-
-echo "copy echo test_operations.zip to dist_dir"
-cp "./dist/test_operations.zip" "$dist_dir/test_operations.zip"
 
 echo "------------------------------------------------------------------------------"
 echo "Build vue website "
