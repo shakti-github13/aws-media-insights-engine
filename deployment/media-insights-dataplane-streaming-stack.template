@@ -24,7 +24,7 @@ Parameters:
   MieAdminRole:
     Type: String
 
-Mappings: 
+Mappings:
   SourceCode:
         General:
             S3Bucket: '%%BUCKET_NAME%%'
@@ -40,7 +40,10 @@ Resources:
   AnalyticsStream:
     Type: "AWS::Kinesis::Stream"
     Properties:
-        ShardCount: !Ref KinesisShardCount
+      ShardCount: !Ref KinesisShardCount
+      StreamEncryption:
+        EncryptionType: "KMS"
+        KeyId: "alias/aws/kinesis"
 
 # ddb stream lambda
 
