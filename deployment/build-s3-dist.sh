@@ -84,7 +84,7 @@ fi
 VENV=$(mktemp -d)
 python3 -m venv $VENV
 source $VENV/bin/activate
-pip install --quiet boto3 chalice docopt aws-sam-translator pyyaml
+pip install --quiet boto3 chalice docopt pyyaml jsonschema
 export PYTHONPATH="$PYTHONPATH:$source_dir/lib/MediaInsightsEngineLambdaHelper/"
 echo "PYTHONPATH=$PYTHONPATH"
 
@@ -857,18 +857,21 @@ echo "running chalice..."
 chalice package --merge-template external_resources.json dist
 echo "...chalice done"
 
-if [ ! -z ${profile} ]; then
-  ./sam-translate.py --profile=$profile
-else
-  ./sam-translate.py
+echo "cp ./dist/sam.json $dist_dir/media-insights-workflowapi-stack.template"
+cp dist/sam.json $dist_dir/media-insights-workflowapi-stack.template
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to build workflow api template"
+  exit 1
 fi
-
-echo "cp ./dist/workflowapi.json $dist_dir/media-insights-workflowapi-stack.template"
-cp dist/workflowapi.json $dist_dir/media-insights-workflowapi-stack.template
 
 echo "cp ./dist/deployment.zip $dist_dir/workflowapi.zip"
 cp ./dist/deployment.zip $dist_dir/workflowapi.zip
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to build workflow api template"
+  exit 1
+fi
 
+rm -f ./dist/*
 
 echo "------------------------------------------------------------------------------"
 echo "Dataplane API Stack"
@@ -886,18 +889,21 @@ fi
 
 chalice package --merge-template external_resources.json dist
 
-if [ ! -z ${profile} ]; then
-  ./sam-translate.py --profile=$profile
-else
-  ./sam-translate.py
+echo "cp ./dist/sam.json $dist_dir/media-insights-dataplane-api-stack.template"
+cp dist/sam.json $dist_dir/media-insights-dataplane-api-stack.template
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to build dataplane api template"
+  exit 1
 fi
-
-echo "cp ./dist/dataplaneapi.json $dist_dir/media-insights-dataplane-api-stack.template"
-cp dist/dataplaneapi.json $dist_dir/media-insights-dataplane-api-stack.template
-
 
 echo "cp ./dist/deployment.zip $dist_dir/dataplaneapi.zip"
 cp ./dist/deployment.zip $dist_dir/dataplaneapi.zip
+if [ $? -ne 0 ]; then
+  echo "ERROR: Failed to build dataplane api template"
+  exit 1
+fi
+
+rm -f ./dist/*
 
 echo "------------------------------------------------------------------------------"
 echo "Build vue website "
