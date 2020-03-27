@@ -77,7 +77,7 @@ Parameters:
   MaxConcurrentWorkflows:
     Type: Number
     Description: Maximum number of workflows to run concurrently.  When the maximum is reached, additional workflows are added to a wait queue.
-    Default: 5
+    Default: 10
     MinValue: 1
   #  TranscriberApp:
   #    Type: String
@@ -927,7 +927,7 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         S3Key:
           !Join [
             "/",
@@ -947,7 +947,7 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         S3Key:
           !Join [
             "/",
@@ -1004,7 +1004,7 @@ Resources:
           DEFAULT_MAX_CONCURRENT_WORKFLOWS: !Ref MaxConcurrentWorkflows
       Handler: app.workflow_scheduler_lambda
       Code:
-        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         S3Key:
           !Join [
             "/",
@@ -1047,7 +1047,7 @@ Resources:
               - Arn
       Handler: app.complete_stage_execution_lambda
       Code:
-        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         S3Key:
           !Join [
             "/",
@@ -1077,7 +1077,7 @@ Resources:
           WORKFLOW_TABLE_NAME: !Ref WorkflowTable
       Handler: app.filter_operation_lambda
       Code:
-        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         S3Key:
           !Join [
             "/",
@@ -1103,7 +1103,7 @@ Resources:
         - !Ref "MediaInsightsEnginePython37Layer"
       Role: !GetAtt "operatorFailedRole.Arn"
       Code:
-        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         S3Key:
           !Join [
             "/",
@@ -1124,7 +1124,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "media-insights-dataplane-api-stack.template",
           ],
@@ -1133,7 +1133,7 @@ Resources:
         DataplaneTableName: !Ref DataplaneTable
         DataplaneBucketName: !Ref Dataplane
         UserPoolArn: !GetAtt MieUserPool.Arn
-        DeploymentPackageBucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        DeploymentPackageBucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         DeploymentPackageKey:
           !Join [
             "/",
@@ -1155,7 +1155,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "media-insights-dataplane-streaming-stack.template",
           ],
@@ -1179,7 +1179,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "media-insights-workflowapi-stack.template",
           ],
@@ -1217,7 +1217,7 @@ Resources:
             - Outputs.APIHandlerArn
         DataPlaneBucket: !Ref Dataplane
         OperatorFailedHandlerLambdaArn: !GetAtt OperatorFailedLambda.Arn
-        DeploymentPackageBucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        DeploymentPackageBucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         DeploymentPackageKey:
           !Join [
             "/",
@@ -1247,7 +1247,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "media-insights-operator-library.template",
           ],
@@ -1275,7 +1275,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "media-insights-test-operations-stack.template",
           ],
@@ -1306,7 +1306,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "instant_translate.template",
           ],
@@ -1330,7 +1330,7 @@ Resources:
   #          "/",
   #          [
   #            "https://s3.amazonaws.com",
-  #            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+  #            !FindInMap ["SourceCode", "General", "S3Bucket"],
   #            !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
   #            "transcribe.template",
   #          ],
@@ -1355,7 +1355,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "rekognition.template",
           ],
@@ -1380,7 +1380,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "comprehend.template",
           ],
@@ -1405,7 +1405,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "MieCompleteWorkflow.template",
           ],
@@ -1428,7 +1428,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "string.template",
           ],
@@ -1448,7 +1448,7 @@ Resources:
           "/",
           [
             "https://s3.amazonaws.com",
-            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+            !FindInMap ["SourceCode", "General", "S3Bucket"],
             !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
             "media-insights-webapp.template",
           ],
@@ -1474,7 +1474,7 @@ Resources:
 #          "/",
 #          [
 #            "https://s3.amazonaws.com",
-#            !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]],
+#            !FindInMap ["SourceCode", "General", "S3Bucket"],
 #            !FindInMap ["SourceCode", "General", "TemplateKeyPrefix"],
 #            "transcriber-webapp.template",
 #          ],
