@@ -9,7 +9,6 @@ MIE is a framework to accelerate the development of serverless applications that
 
 MIE includes a demo GUI for video content analysis and search. The [Implementation Guide](https://github.com/awslabs/aws-media-insights-engine/blob/master/IMPLEMENTATION_GUIDE.md) explains how to build other applications with MIE. 
 
-
 # Installation
 You can deploy MIE and the demo GUI in your AWS account with the following one-click deploy buttons:
 
