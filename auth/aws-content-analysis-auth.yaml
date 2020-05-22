@@ -201,7 +201,7 @@ Resources:
       UserAttributes: [{"Name": "email", "Value": !Ref AdminEmail}]
       Username: !Ref AdminEmail
       UserPoolId: !Ref ContentAnalysisUserPool
-
+  # TODO: Need to add S3 put access to dataplane bucket on public/upload/*
   ContentAnalysisAdminRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -230,7 +230,7 @@ Resources:
                       "execute-api:Invoke"
                     ],
                     "Effect": "Allow",
-                    "Resource": ["arn:aws:execute-api:${region}:${account}:${wfapi}/*/", "arn:aws:execute-api:${region}:${account}:${dataapi}/*/"]
+                    "Resource": ["arn:aws:execute-api:${region}:${account}:${wfapi}/*", "arn:aws:execute-api:${region}:${account}:${dataapi}/*"]
                   }
                 ]
               }

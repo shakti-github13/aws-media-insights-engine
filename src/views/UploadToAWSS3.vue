@@ -22,27 +22,20 @@
         >
           {{ invalidFileMessages[invalidFileMessages.length-1] }}
         </b-alert>
-        <h1>Upload Videos</h1>
-        <p>{{ description }}</p>
-        <vue-dropzone
-          id="dropzone"
-          ref="myVueDropzone"
-          :awss3="awss3"
-          :options="dropzoneOptions"
-          @vdropzone-s3-upload-error="s3UploadError"
-          @vdropzone-file-added="fileAdded"
-          @vdropzone-removed-file="fileRemoved"
-          @vdropzone-success="runWorkflow"
-          @vdropzone-sending="upload_in_progress=true"
-          @vdropzone-queue-complete="upload_in_progress=false"
-        />
+        <h1>Upload Content</h1>
+        <b-form-file
+          v-model="file"
+          size="lg"
+          placeholder="Choose a file or drop it here..."
+          drop-placeholder="Drop file here..."
+        >
+        </b-form-file>
       </div>
       <br />
-      <span v-if="upload_in_progress" class="text-secondary">Upload in progress</span>
-      <b-container v-if="upload_in_progress">
-        <b-spinner label="upload_in_progress" />
+      <b-container v-if="isUploading">
+        <b-progress :value="uploadValue" show-progress animated></b-progress>
       </b-container>
-      <br />
+      <p>{{ description }}</p>
       <b-container>
         <b-row v-if="hasAssetParam">
           <b-col>
@@ -50,10 +43,10 @@
               Configure Workflow
             </b-button>
             <b-button v-if="validForm" variant="primary" @click="runWorkflow">
-              Run Workflow
+              Start Workflow
             </b-button>
             <b-button v-else disabled variant="primary">
-              Run Workflow
+              Start Workflow
             </b-button>
           </b-col>
         </b-row>
@@ -67,10 +60,10 @@
               variant="primary"
               @click="uploadFiles"
             >
-              Upload and Run Workflow
+              Start Workflow
             </b-button>
             <b-button v-else disabled variant="primary">
-              Upload and Run Workflow
+              Start Workflow
             </b-button>
           </b-col>
         </b-row>
@@ -181,17 +174,18 @@
 </template>
 
 <script>
-import vueDropzone from "@/components/vue-dropzone.vue";
 import Header from "@/components/Header.vue";
 import { mapState } from "vuex";
 
 export default {
   components: {
-    vueDropzone,
     Header
   },
   data() {
     return {
+      file: null,
+      isUploading: null,
+      uploadValue: null,
       valid_media_types: [
         "cmaf",
         "dash",
@@ -233,7 +227,6 @@ export default {
       thumbnail_position: 10,
       hasAssetParam: false,
       assetIdParam: "",
-      upload_in_progress: false,
       enabledOperators: [
         "labelDetection",
         "celebrityRecognition",
@@ -367,23 +360,8 @@ export default {
       executed_assets: [],
       workflow_status_polling: null,
       description:
-        "Click start to begin. Media analysis status will be shown after upload completes.",
+        "Click Start Workflow to begin. Content analysis status will be shown after the workflow is started.",
       s3_destination: "s3://" + this.DATAPLANE_BUCKET,
-      dropzoneOptions: {
-        url: "https://" + this.DATAPLANE_BUCKET + ".s3.amazonaws.com",
-        thumbnailWidth: 200,
-        addRemoveLinks: true,
-        autoProcessQueue: false,
-        // disable network timeouts (important for large uploads)
-        timeout: 0,
-        // limit max upload file size (in MB)
-        maxFilesize: 2000
-      },
-      awss3: {
-        signingURL: "",
-        headers: {},
-        params: {}
-      }
     };
   },
   computed: {
@@ -567,48 +545,49 @@ export default {
       this.uploadErrorMessage = error;
       this.dismissCountDown = this.dismissSecs;
     },
-    fileAdded: function(file) {
-      let errorMessage = "";
-      if (
-        !file.type.match(/image\/.+|video\/.+|application\/json/g) &&
-        !this.valid_media_types.includes(
-          file.name
-            .split(".")
-            .pop()
-            .toLowerCase()
-        )
-      ) {
-        if (file.type === "") {
-          console.log("here");
-          errorMessage = "Unsupported file type: unknown";
-        } else errorMessage = "Unsupported file type: " + file.type;
-        this.invalidFileMessages.push(errorMessage);
-        this.showInvalidFile = true;
-      }
-    },
-    fileRemoved: function(file) {
-      let errorMessage = "";
-      if (!file.type.match(/image\/.+|video\/.+|application\/json/g)) {
-        if (file.type === "") errorMessage = "Unsupported file type: unknown";
-        else errorMessage = "Unsupported file type: " + file.type;
-      }
-      this.invalidFileMessages = this.invalidFileMessages.filter(function(
-        value
-      ) {
-        return value != errorMessage;
-      });
-      if (this.invalidFileMessages.length === 0) this.showInvalidFile = false;
-    },
+    
+    // TODO: Update these methods to use events from vue bootstrap file picker component
+
+    // fileAdded: function(file) {
+    //   let errorMessage = "";
+    //   if (
+    //     !file.type.match(/image\/.+|video\/.+|application\/json/g) &&
+    //     !this.valid_media_types.includes(
+    //       file.name
+    //         .split(".")
+    //         .pop()
+    //         .toLowerCase()
+    //     )
+    //   ) {
+    //     if (file.type === "") {
+    //       console.log("here");
+    //       errorMessage = "Unsupported file type: unknown";
+    //     } else errorMessage = "Unsupported file type: " + file.type;
+    //     this.invalidFileMessages.push(errorMessage);
+    //     this.showInvalidFile = true;
+    //   }
+    // },
+    // fileRemoved: function(file) {
+    //   let errorMessage = "";
+    //   if (!file.type.match(/image\/.+|video\/.+|application\/json/g)) {
+    //     if (file.type === "") errorMessage = "Unsupported file type: unknown";
+    //     else errorMessage = "Unsupported file type: " + file.type;
+    //   }
+    //   this.invalidFileMessages = this.invalidFileMessages.filter(function(
+    //     value
+    //   ) {
+    //     return value != errorMessage;
+    //   });
+    //   if (this.invalidFileMessages.length === 0) this.showInvalidFile = false;
+    // },
+    
     runWorkflow: async function(location) {
-      const token = await this.$Amplify.Auth.currentSession().then(data => {
-        return data.getIdToken().getJwtToken();
-      });
       const vm = this;
       let media_type = null;
       let s3Key = null;
-      if ("s3ObjectLocation" in location) {
+      if ("key" in location) {
         media_type = location.type;
-        s3Key = location.s3ObjectLocation.fields.key;
+        s3Key = 'public/' + location.key; // add in public since amplify prepends that to all keys
       } else {
         media_type = this.$route.query.mediaType;
         s3Key = this.$route.query.s3key.split("/").pop();
@@ -709,7 +688,7 @@ export default {
         } else if (
           media_type.match(/video/g) ||
           this.valid_media_types.includes(
-            location.s3ObjectLocation.fields.key
+            s3key
               .split(".")
               .pop()
               .toLowerCase()
@@ -734,90 +713,66 @@ export default {
         }
       }
       //console.log(JSON.stringify(data));
-      fetch(this.WORKFLOW_API_ENDPOINT + "workflow/execution", {
-        method: "post",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json", Authorization: token }
-      }).then(response =>
-        response
-          .json()
-          .then(data => ({
-            data: data,
-            status: response.status
-          }))
-          .then(res => {
-            if (res.status !== 200) {
-              alert(
-                "ERROR: Failed to start workflow. Check Workflow API logs."
-              );
-              // console.log("ERROR: Failed to start workflow.");
-              // console.log(res.data.Code);
-              // console.log(res.data.Message);
-              // console.log("URL: " + this.WORKFLOW_API_ENDPOINT + 'workflow/execution');
-              // console.log("Data:");
-              // console.log(JSON.stringify(data));
-              // console.log((data));
-              // console.log("Response: " + response.status);
-            } else {
-              let asset_id = res.data.AssetId;
-              let wf_id = res.data.Id;
-              //console.log("Media assigned asset id: " + asset_id);
-              let executed_asset = {
-                asset_id: asset_id,
-                file_name: s3Key,
-                workflow_status: "",
-                state_machine_console_link: "",
-                wf_id: wf_id
-              };
-              vm.executed_assets.push(executed_asset);
-              vm.getWorkflowStatus(wf_id);
-              this.hasAssetParam = false;
-              this.assetIdParam = "";
-            }
-          })
-      );
+      
+      // TODO: Should this be its own function?
+
+      let apiName = 'mieWorkflowApi'
+      let path = 'workflow/execution'
+      let requestOpts = {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          response: true,
+          body: data,
+          queryStringParameters: {} // optional
+      };
+      try {
+        let response = await this.$Amplify.API.post(apiName, path, requestOpts);
+        let asset_id = response.data.AssetId;
+        let wf_id = response.data.Id;
+        //console.log("Media assigned asset id: " + asset_id);
+        let executed_asset = {
+            asset_id: asset_id,
+            file_name: s3Key,
+            workflow_status: "",
+            state_machine_console_link: "",
+            wf_id: wf_id
+          };
+        vm.executed_assets.push(executed_asset);
+        vm.getWorkflowStatus(wf_id);
+        this.hasAssetParam = false;
+        this.assetIdParam = "";
+      } catch (error) {
+        alert(
+          "ERROR: Failed to start workflow. Check Workflow API logs."
+        );
+        console.log(error)
+      }
     },
     async getWorkflowStatus(wf_id) {
-      const token = await this.$Amplify.Auth.currentSession().then(data => {
-        return data.getIdToken().getJwtToken();
-      });
       const vm = this;
-      fetch(
-        this.WORKFLOW_API_ENDPOINT + "workflow/execution/" + wf_id,
-        {
-          method: "get",
-          headers: {
-            Authorization: token
+      let apiName = 'mieWorkflowApi'
+      let path =  "workflow/execution/" + wf_id
+      let requestOpts = {
+        headers: {},
+        response: true,
+        queryStringParameters: {} // optional
+      };
+      try {
+        let response = await this.$Amplify.API.get(apiName, path, requestOpts);
+        for (let i = 0; i < vm.executed_assets.length; i++) {
+          if (vm.executed_assets[i].wf_id === wf_id) {
+            vm.executed_assets[i].workflow_status = response.data.Status;
+            vm.executed_assets[i].state_machine_console_link =
+            "https://" + this.AWS_REGION + ".console.aws.amazon.com/states/home?region=" + this.AWS_REGION + "#/executions/details/" + response.data.StateMachineExecutionArn;
+            break;
           }
         }
-      ).then(response =>
-        response
-          .json()
-          .then(data => ({
-            data: data,
-            status: response.status
-          }))
-          .then(res => {
-            if (res.status !== 200) {
-              alert("ERROR: Failed to get workflow status");
-            } else {
-              for (let i = 0; i < vm.executed_assets.length; i++) {
-                if (vm.executed_assets[i].wf_id === wf_id) {
-                  vm.executed_assets[i].workflow_status = res.data.Status;
-                  vm.executed_assets[i].state_machine_console_link =
-                    "https://" +
-                    this.AWS_REGION +
-                    ".console.aws.amazon.com/states/home?region=" +
-                    this.AWS_REGION +
-                    "#/executions/details/" +
-                    res.data.StateMachineExecutionArn;
-                  break;
-                }
-              }
-              this.$store.commit("updateExecutedAssets", vm.executed_assets);
-            }
-          })
-      );
+      this.$store.commit("updateExecutedAssets", vm.executed_assets);
+      } catch (error) {
+        alert("ERROR: Failed to get workflow status");
+        console.log(error)
+      }
     },
     pollWorkflowStatus() {
       // Poll frequency in milliseconds
@@ -835,10 +790,31 @@ export default {
       }, poll_frequency);
     },
     uploadFiles() {
-      //console.log("Uploading to s3://" + this.DATAPLANE_BUCKET,);
-      const signurl = this.DATAPLANE_API_ENDPOINT + "/upload";
-      this.$refs.myVueDropzone.setAWSSigningURL(signurl);
-      this.$refs.myVueDropzone.processQueue();
+      let key = 'upload/' + this.file.name
+      let vm = this // hate this, not sure how to get correct scope inside the progressCallback method
+      this.$Amplify.Storage.put(key, this.file, {
+        level: 'public', // not actually public in the S3 sense, this is just an amplify construct
+        progressCallback(progress) {
+          vm.isUploading = true
+          vm.uploadValue = 0
+          let uploadedDec = (progress.loaded / progress.total) * 100
+          vm.uploadValue = uploadedDec
+        },
+      }).then(function(result) {
+              vm.isUploading = null
+              vm.uploadValue = null
+              let location = result
+              location.type = vm.file.type
+              vm.runWorkflow(location)
+              vm.file = null
+        }
+      ).catch (function(err) {
+          alert(err)
+          vm.isUploading = null
+          vm.uploadValue = null
+          vm.file = null
+          
+      });
     },
     clearHistory() {
       this.executed_assets = [];

@@ -110,7 +110,7 @@
       async fetchAssetData () {
         this.isBusy = true;
         let query = 'AssetId:'+this.$route.params.asset_id+' Operator:mediainfo';
-        let apiName = 'mieElasticsearch';
+        let apiName = 'contentAnalysisElasticsearch';
         let path = '/_search';
         let apiParams = {
           headers: {'Content-Type': 'application/json'},
@@ -158,18 +158,21 @@
           if ("height" in track_data["Video"][0]) {
             this.height = track_data["Video"][0].height;
           }
-          if ("other_bit_rate" in track_data["Audio"][0]) {
-            this.other_bit_rate = track_data["Audio"][0].other_bit_rate[0];
-          }
-          if ("other_sampling_rate" in track_data["Audio"][0]) {
-            this.other_sampling_rate = track_data["Audio"][0].other_sampling_rate[0];
-          }
-          if ("other_language" in track_data["Audio"][0]) {
-            this.other_language = track_data["Audio"][0].other_language[0];
-          }
-          if ("encoded_date" in track_data["Audio"][0]) {
-            this.encoded_date = track_data["Audio"][0].encoded_date;
-          }
+
+          if (track_data["Audio"].length > 0) {
+            if ("other_bit_rate" in track_data["Audio"][0]) {
+              this.other_bit_rate = track_data["Audio"][0].other_bit_rate[0];
+            }
+            if ("other_sampling_rate" in track_data["Audio"][0]) {
+              this.other_sampling_rate = track_data["Audio"][0].other_sampling_rate[0];
+            }
+            if ("other_language" in track_data["Audio"][0]) {
+              this.other_language = track_data["Audio"][0].other_language[0];
+            }
+            if ("encoded_date" in track_data["Audio"][0]) {
+              this.encoded_date = track_data["Audio"][0].encoded_date;
+            }
+          } 
           this.isBusy = false
         }
       }
