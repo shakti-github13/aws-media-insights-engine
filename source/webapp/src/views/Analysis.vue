@@ -93,6 +93,28 @@
               </component>
             </keep-alive>
           </div>
+          <b-button
+              :pressed="false"
+              size="sm"
+              variant="link"
+              class="text-decoration-none"
+              @click="showCli = true"
+          >
+            Show API request to get asset metadata
+          </b-button>
+          <b-modal
+              v-model="showCli"
+              title="REST API"
+              ok-only
+          >
+            <label>Request URL:</label>
+            <pre v-highlightjs="restApi"><code class="bash"></code></pre>
+            <p>If the response provides a cursor then you can get the next page by specifying the cursor like this:
+            </p>
+            <pre v-highlightjs="restApi+'?cursor={cursor}'"><code class="bash"></code></pre>
+            <label>Sample command:</label>
+            <pre v-highlightjs="curlCommand"><code class="bash"></code></pre>
+          </b-modal>
         </b-col>
         <b-col>
           <div v-if="mediaType === 'image'">
@@ -224,8 +246,11 @@
         error: ComponentLoadingError
       })
     },
-    data: function () {
+    data() {
       return {
+        curlCommand: '',
+        restApi: '',
+        showCli: false,
         s3_uri: '',
         filename: '',
         currentView: 'LabelObjects',
@@ -259,6 +284,8 @@
             return data.getIdToken().getJwtToken();
           });
           const asset_id = this.$route.params.asset_id;
+          this.curlCommand = 'curl -X GET -H "Authorization: '+ token + '" -H "Content-Type: application/json" '+this.DATAPLANE_API_ENDPOINT+'metadata/'+asset_id
+          this.restApi = 'GET '+this.DATAPLANE_API_ENDPOINT+'metadata/{asset_id}'
           fetch(this.DATAPLANE_API_ENDPOINT+'/metadata/'+asset_id, {
             method: 'get',
             headers: {

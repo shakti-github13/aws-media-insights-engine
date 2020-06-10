@@ -142,6 +142,25 @@
           </div>
         </b-col>
       </b-row>
+      <b-button
+          :pressed="false"
+          size="sm"
+          variant="link"
+          class="text-decoration-none"
+          @click="showCli = true"
+      >
+        Show API request to list video assets
+      </b-button>
+      <b-modal
+          v-model="showCli"
+          title="REST API"
+          ok-only
+      >
+        <label>Request URL:</label>
+        <pre v-highlightjs><code class="bash">GET {{DATAPLANE_API_ENDPOINT}}metadata</code></pre>
+        <label>Sample command:</label>
+        <pre v-highlightjs="curlCommand"><code class="bash"></code></pre>
+      </b-modal>
     </b-container>
   </div>
 </template>
@@ -160,6 +179,9 @@
     },
     data() {
       return {
+        showCli: false,
+        curlCommand: '',
+        restApi: '',
         showElasticSearchAlert: false,
         showDataplaneAlert: false,
         showDeletedAlert: 0,
@@ -230,6 +252,7 @@
       },
       async deleteAsset(asset_id) {
         let token = await this.getAccessToken();
+        console.log("curl -X DELETE -H \"Authorization: "+token+"\" -H \"Content-Type: application/json\" " + this.DATAPLANE_API_ENDPOINT+'/metadata/'+asset_id)
         let response = await fetch(this.DATAPLANE_API_ENDPOINT+'/metadata/'+asset_id, {
           method: 'delete',
           headers: {
@@ -354,6 +377,7 @@
         }
       },
       async fetchAssets (token) {
+        this.curlCommand = 'curl -X GET -H "Authorization: '+ token + '" -H "Content-Type: application/json" '+this.DATAPLANE_API_ENDPOINT+'metadata'
         let response = await fetch(this.DATAPLANE_API_ENDPOINT+'/metadata', {
             method: 'get',
             headers: {
@@ -476,5 +500,12 @@
     word-break:break-all;
     overflow: hidden;
     text-overflow:ellipsis;
+  }
+  pre {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
   }
 </style>

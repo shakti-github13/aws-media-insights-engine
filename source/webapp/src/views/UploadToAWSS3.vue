@@ -37,7 +37,31 @@
           @vdropzone-queue-complete="upload_in_progress=false"
         />
       </div>
-      <br />
+      <br>
+      <b-button
+          :pressed="false"
+          size="sm"
+          variant="link"
+          class="text-decoration-none"
+          @click="showExecuteApi = true"
+      >
+        Show API request to run workflow
+      </b-button>
+      <b-modal
+          v-model="showExecuteApi"
+          scrollable
+          title="REST API"
+          ok-only
+      >
+        <label>Request URL:</label>
+        <pre v-highlightjs><code class="bash">POST {{ WORKFLOW_API_ENDPOINT }}workflow/execution</code></pre>
+        <label>Request data:</label>
+        <pre v-highlightjs="JSON.stringify(workflowConfigWithInput)"><code class="json"></code></pre>
+        <label>Sample command:</label>
+        <p>Be sure to replace "SAMPLE_VIDEO.MP4" with the S3 key of an actual file.</p>
+        <pre v-highlightjs="curlCommand"><code class="bash"></code></pre>
+      </b-modal>
+      <br>
       <span v-if="upload_in_progress" class="text-secondary">Upload in progress</span>
       <b-container v-if="upload_in_progress">
         <b-spinner label="upload_in_progress" />
@@ -176,6 +200,27 @@
       <b-button size="sm" @click="clearHistory">
         Clear History
       </b-button>
+      <br>
+      <b-button
+          :pressed="false"
+          size="sm"
+          variant="link"
+          class="text-decoration-none"
+          @click="showWorkflowStatusApi = true"
+      >
+        Show API request to get execution history
+      </b-button>
+      <b-modal
+          v-model="showWorkflowStatusApi"
+          title="REST API command"
+          ok-only
+      >
+        <label>Request URL:</label>
+        <pre v-highlightjs><code class="bash">GET {{ WORKFLOW_API_ENDPOINT }}workflow/execution/asset/{asset_id}</code></pre>
+        <label>Sample command:</label>
+        <p>Be sure to replace "{asset_id}" with a valid asset ID.</p>
+        <pre v-highlightjs="curlCommand2"><code class="bash"></code></pre>
+      </b-modal>
     </b-container>
   </div>
 </template>
@@ -192,6 +237,15 @@ export default {
   },
   data() {
     return {
+      restApi2: '',
+      curlCommand: '',
+      curlCommand2: '',
+      tokenForCurlCommand: '',
+      showWorkflowStatusApi: false,
+      showExecuteApi: false,
+      requestURL: "",
+      requestBody: "",
+      requestType: "",
       valid_media_types: [
         "cmaf",
         "dash",
@@ -377,7 +431,7 @@ export default {
         // disable network timeouts (important for large uploads)
         timeout: 0,
         // limit max upload file size (in MB)
-        maxFilesize: 2000
+        maxFilesize: 3000
       },
       awss3: {
         signingURL: "",
@@ -522,6 +576,20 @@ export default {
           }
         }
       };
+    },
+    workflowConfigWithInput() {
+      // This function is just used to pretty print the rest api
+      // for workflow execution in a popup modal
+      let data = this.workflowConfig
+      data["Input"] = {
+        "Media": {
+          "Video": {
+            "S3Bucket": this.DATAPLANE_BUCKET,
+            "S3Key": "SAMPLE_VIDEO.MP4"
+          }
+        }
+      }
+      return data
     }
   },
   created: function() {
@@ -531,6 +599,7 @@ export default {
     }
   },
   mounted: function() {
+    this.getCurlCommand();
     this.executed_assets = this.execution_history;
     this.pollWorkflowStatus();
     //console.log("this.DATAPLANE_BUCKET: " + this.DATAPLANE_BUCKET)
@@ -539,6 +608,16 @@ export default {
     clearInterval(this.workflow_status_polling);
   },
   methods: {
+    getCurlCommand() {
+      this.$Amplify.Auth.currentSession().then(data =>{
+        const token = data.getIdToken().getJwtToken();
+        // get curl command to request workflow execution
+        this.curlCommand = 'curl -X POST -H "Authorization: '+token+'" -H "Content-Type: application/json" --data \''+JSON.stringify(this.workflowConfigWithInput)+'\' '+this.WORKFLOW_API_ENDPOINT+'workflow/execution'
+        // get curl command to request execution history
+        this.curlCommand2 = 'curl -X GET -H "Authorization: '+token+'" -H "Content-Type: application/json" '+this.WORKFLOW_API_ENDPOINT+'workflow/execution/asset/{asset_id}'
+      });
+
+    },
     selectAll: function() {
       this.enabledOperators = [
         "labelDetection",
