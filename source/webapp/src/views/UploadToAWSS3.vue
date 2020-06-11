@@ -212,7 +212,7 @@
       </b-button>
       <b-modal
           v-model="showWorkflowStatusApi"
-          title="REST API command"
+          title="REST API"
           ok-only
       >
         <label>Request URL:</label>
