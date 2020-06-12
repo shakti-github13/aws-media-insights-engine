@@ -93,6 +93,7 @@
               </component>
             </keep-alive>
           </div>
+          <hr>
           <b-button
               :pressed="false"
               size="sm"
