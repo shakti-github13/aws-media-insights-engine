@@ -30,6 +30,10 @@ import os
 import json
 import boto3
 from pymediainfo import MediaInfo
+import requests
+import PIL.ExifTags
+import PIL.Image
+from io import BytesIO
 
 from MediaInsightsEngineLambdaHelper import MediaInsightsOperationHelper
 from MediaInsightsEngineLambdaHelper import MasExecutionError
@@ -89,6 +93,27 @@ def lambda_handler(event, context):
         media_info = MediaInfo.parse(signed_url)
         # Save the result
         metadata_json = json.loads(media_info.to_json())
+
+        # For images only, get EXIF data using Python Pillow package
+        if "Image" in event["Input"]["Media"]:
+            url = s3_cli.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': key}, ExpiresIn=signed_url_expiration)
+            response = requests.get(url)
+            img = PIL.Image.open(BytesIO(response.content))
+            if (isinstance(img._getexif(),dict)):
+                exif = {
+                    PIL.ExifTags.TAGS[k]: v
+                    for k, v in img._getexif().items()
+                    if k in PIL.ExifTags.TAGS
+                }
+                # Convert all the exif values to strings. This is needed because
+                # some of the exif values are arrays expressed with parenthesis,
+                # which will cause a 'JSON not serializable' error when we try
+                # to persist this dict as metadata.
+                for key in exif.keys():
+                    exif[key] = str(exif[key])
+                # Merge the exif data with the previously obtained mediainfo data:
+                metadata_json.update(exif)
+
         # If there's no Video, Audio, Image, or Text data then delete the file.
         track_types = [track['track_type'] for track in metadata_json['tracks']]
         if ('Video' not in track_types and

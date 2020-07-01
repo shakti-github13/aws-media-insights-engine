@@ -14,7 +14,7 @@ dataplane_bucket = os.environ['DataplaneBucket']
 s3 = boto3.client('s3')
 
 # These names are the lowercase version of OPERATOR_NAME defined in /source/operators/operator-library.yaml
-supported_operators = ["textdetection", "mediainfo", "transcribe", "translate", "genericdatalookup", "labeldetection", "celebrityrecognition", "facesearch", "contentmoderation", "facedetection", "key_phrases", "entities", "key_phrases"]
+supported_operators = ["textdetection", "mediainfo", "mediainfoimage", "transcribe", "translate", "genericdatalookup", "labeldetection", "celebrityrecognition", "facesearch", "contentmoderation", "facedetection", "key_phrases", "entities", "key_phrases"]
 
 
 def normalize_confidence(confidence_value):
@@ -376,6 +376,10 @@ def process_mediainfo(asset, workflow, results):
             item["Operator"] = "mediainfo"
             item["Workflow"] = workflow
             extracted_items.append(item)
+    del metadata['tracks']
+    metadata["Operator"] = "mediainfo"
+    metadata["Workflow"] = workflow
+    extracted_items.append(metadata)
     bulk_index(es, asset, "mediainfo", extracted_items)
 
 def process_generic_data(asset, workflow, results):
@@ -777,7 +781,7 @@ def lambda_handler(event, context):
                             process_transcribe(asset_id, workflow, metadata["Results"])
                         if operator == "translate":
                             process_translate(asset_id, workflow, metadata["Results"])
-                        if operator == "mediainfo":
+                        if operator == "mediainfo" or operator == "mediainfoimage":
                             process_mediainfo(asset_id, workflow, metadata["Results"])
                         if operator == "genericdatalookup":
                             process_generic_data(asset_id, workflow, metadata["Results"])
@@ -798,7 +802,7 @@ def lambda_handler(event, context):
                         if operator == "textdetection":
                             process_text_detection(asset_id, workflow, metadata["Results"])
                     else:
-                        print("We do not store {operator} results".format(operator=operator))
+                        print("WARNING: We do not store {operator} results".format(operator=operator))
                 else:
                     print("Unable to read metadata from s3: {e}".format(e=metadata["Error"]))
         elif action == "REMOVE":

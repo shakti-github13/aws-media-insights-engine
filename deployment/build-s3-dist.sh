@@ -243,6 +243,26 @@ cd "$source_dir/operators/mediainfo" || exit 1
 # Make lambda package
 [ -e dist ] && rm -r dist
 mkdir -p dist
+[ -e package ] && rm -r package
+mkdir -p package
+echo "create requirements for lambda"
+# Make lambda package
+pushd package || exit 1
+echo "create lambda package"
+# Handle distutils install errors
+touch ./setup.cfg
+echo "[install]" > ./setup.cfg
+echo "prefix= " >> ./setup.cfg
+# Try and handle failure if pip version mismatch
+if [ -x "$(command -v pip)" ]; then
+  pip install --quiet -r ../requirements.txt --target .
+elif [ -x "$(command -v pip3)" ]; then
+  echo "pip not found, trying with pip3"
+  pip3 install --quiet -r ../requirements.txt --target .
+elif ! [ -x "$(command -v pip)" ] && ! [ -x "$(command -v pip3)" ]; then
+ echo "No version of pip installed. This script requires pip. Cleaning up and exiting."
+ exit 1
+fi
 # Add the app code to the dist zip.
 zip -q dist/mediainfo.zip mediainfo.py
 # Zip is ready. Copy it to the distribution directory.
