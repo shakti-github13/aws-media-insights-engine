@@ -1,16 +1,12 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Media Insights Engine - Workflow to run all MIE analyses"
+Description: "AWS Content Analysis Workflow - Workflow to run all analyses"
 
 Parameters:
   WorkflowCustomResourceArn:
     Type: String
     Description: "ARN of the Media Insights custom resource that handles creating operations, stages and workflows"
-  # FIXME - this doesn't work well with nesting - just pass in the layer resource
-  # MediaInsightsWorkflowStack:
-    # Description: "Name of the base media insights workflow stack"
-    # Type: String
   OperatorLibraryStack:
-    Description: "Name of the operator library stack"
+    Description: "Name of the MIE operator library stack"
     Type: String
 
 Resources:

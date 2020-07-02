@@ -10,13 +10,7 @@ Parameters:
     Type: String
   DataplaneBucket:
     Type: String
-  UserPoolId:
-    Type: String
-  IdentityPoolId:
-    Type: String
   AwsRegion:
-    Type: String
-  PoolClientId:
     Type: String
 
 Mappings:
@@ -157,7 +151,7 @@ Resources:
           DataplaneBucket: !Ref DataplaneBucket
           UserPoolId: !Ref UserPoolId
           IdentityPoolId: !Ref IdentityPoolId
-          AwsRegion: !Ref AwsRegion
+          AwsRegion: !Ref AWS::Region
           PoolClientId: !Ref PoolClientId
 
   CopyWebSource:

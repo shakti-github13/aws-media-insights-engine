@@ -792,6 +792,7 @@ export default {
     uploadFiles() {
       let key = 'upload/' + this.file.name
       let vm = this // hate this, not sure how to get correct scope inside the progressCallback method
+      console.log('creds', this.$Amplify.Auth.currentSession())
       this.$Amplify.Storage.put(key, this.file, {
         level: 'public', // not actually public in the S3 sense, this is just an amplify construct
         progressCallback(progress) {

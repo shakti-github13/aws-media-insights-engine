@@ -11,6 +11,12 @@ Parameters:
   DataplaneAPIRestID:
     Description: REST API ID of the MIE Dataplane API
     Type: String
+  ElasticDomainArn:
+    Description: ARN of the Content Analysis ES Domain
+    Type: String
+  DataplaneBucket: 
+    Description: Name of the MIE dataplane bucket
+    Type: String
 
 Resources:
   ContentAnalysisUserPool:
@@ -201,6 +207,7 @@ Resources:
       UserAttributes: [{"Name": "email", "Value": !Ref AdminEmail}]
       Username: !Ref AdminEmail
       UserPoolId: !Ref ContentAnalysisUserPool
+
   # TODO: Need to add S3 put access to dataplane bucket on public/upload/*
   ContentAnalysisAdminRole:
     Type: "AWS::IAM::Role"
@@ -231,6 +238,29 @@ Resources:
                     ],
                     "Effect": "Allow",
                     "Resource": ["arn:aws:execute-api:${region}:${account}:${wfapi}/*", "arn:aws:execute-api:${region}:${account}:${dataapi}/*"]
+                  },
+                  {
+                    "Action": [
+                      "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": [
+                      "arn:aws:s3:::${dataplanebucket}/public/*"
+                    ]
+                  },
+                  {
+                    "Action": [
+                      "s3:ListBucket"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "arn:aws:s3:::${dataplanebucket}"
+                  },
+                  {
+                    "Action": [
+                      "es:*"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": "${esdomain}/*"
                   }
                 ]
               }
@@ -238,7 +268,9 @@ Resources:
               region: !Ref "AWS::Region",
               account: !Ref "AWS::AccountId",
               wfapi: !Ref WorkflowAPIRestID,
-              dataapi: !Ref DataplaneAPIRestID
+              dataapi: !Ref DataplaneAPIRestID,
+              esdomain: !Ref ElasticDomainArn,
+              dataplanebucket: !Ref DataplaneBucket
             }
 
   AddAdminUserToAdminGroup:
@@ -252,3 +284,9 @@ Resources:
 Outputs:
   AdminRoleArn:
     Value: !GetAtt ContentAnalysisAdminRole.Arn
+  UserPoolId:
+    Value: !Ref ContentAnalysisUserPool
+  IdentityPoolId:
+    Value: !Ref ContentAnalysisIdentityPool
+  UserPoolClientId:
+    Value: !Ref ContentAnalysisWebAppClient
