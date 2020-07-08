@@ -1,239 +1,186 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Media Insights Engine - AWS CloudFormation template that provisions a web application for exploring extracted data
+Description: AWS Content Analysis - Deploys the AWS Content Analysis Application
 
 Parameters:
-  DataplaneEndpoint:
+  MieStackName:
+    Description: Name of the Media Insights Engine framework stack
     Type: String
-  WorkflowEndpoint:
+  AdminEmail:
+    Description: Email address of the Content Analysis Administrator
     Type: String
-  ElasticEndpoint:
+  ElasticSearchNodeSize:
+    Description: "The node type to be provisioned for the Elasticsearch cluster"
     Type: String
-  DataplaneBucket:
+    Default: "t2.small.elasticsearch"
+    AllowedValues:
+      - "t2.small.elasticsearch"
+      - "m4.large.elasticsearch"
+      - "m4.xlarge.elasticsearch"
+      - "c4.large.elasticsearch"
+      - "c4.xlarge.elasticsearch"
+      - "r4.large.elasticsearch"
+      - "r4.xlarge.elasticsearch"
+  DeployTestWorkflow:
+    Description: Deploy test workflow which contains operator, stage, and workflow stubs for integration testing
     Type: String
-  AwsRegion:
-    Type: String
+    Default: No
+    AllowedValues:
+      - Yes
+      - No
 
 Mappings:
-  SourceCode:
-    General:
+  ContentAnalysisApp:
+    SourceCode:
       S3Bucket: "%%BUCKET_NAME%%"
-      CodeKeyPrefix: "media-insights-solution/%%VERSION%%/code"
-      TemplateKeyPrefix: "media-insights-solution/%%VERSION%%/cf"
-      WebsitePrefix: "media-insights-solution/%%VERSION%%/code/website"
+      CodeKeyPrefix: "content-analysis-solution/%%VERSION%%/code"
+      TemplateKeyPrefix: "content-analysis-solution/%%VERSION%%/cf"
+      WebsitePrefix: "content-analysis-solution/%%VERSION%%/code/website"
 
 Resources:
-  MediaInsightsWebsiteBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
-    Properties:
-      AccessControl: LogDeliveryWrite
-      BucketName:
-        Fn::Transform:
-          Name: 'String'
-          Parameters:
-            InputString: !Sub "${AWS::StackName}-website"
-            Operation: Lower
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      WebsiteConfiguration:
-        IndexDocument: "index.html"
-        ErrorDocument: "index.html"
-      LoggingConfiguration:
-        DestinationBucketName:
-          Fn::Transform:
-            Name: 'String'
-            Parameters:
-              InputString: !Sub "${AWS::StackName}-website"
-              Operation: Lower
-        LogFilePrefix: "access_logs/"
-      LifecycleConfiguration:
-        Rules:
-          - Id: "Keep access log for 30 days"
-            Status: Enabled
-            Prefix: "access_logs/"
-            ExpirationInDays: 30
-            AbortIncompleteMultipartUpload:
-              DaysAfterInitiation: 1
-          - Id: "Keep cloudfront log for 30 days"
-            Status: Enabled
-            Prefix: "cf_logs/"
-            ExpirationInDays: 30
-            AbortIncompleteMultipartUpload:
-              DaysAfterInitiation: 1
+  # Deploy Elasticsearch
 
-  WebBucketPolicy:
-    Type: AWS::S3::BucketPolicy
+  ContentAnalysisElasticsearchStack:
+    Type: "AWS::CloudFormation::Stack"
     Properties:
-      Bucket: !Ref MediaInsightsWebsiteBucket
-      PolicyDocument:
-        Statement:
-          - Effect: Deny
-            Principal: "*"
-            Action: "*"
-            Resource: !Sub "arn:aws:s3:::${MediaInsightsWebsiteBucket}/*"
-            Condition:
-              Bool:
-                aws:SecureTransport: false
+      TemplateURL: !Join
+        - ""
+        - - "https://"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - S3Bucket
+          - .s3-
+          - !Ref AWS::Region
+          - ".amazonaws.com/"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - TemplateKeyPrefix
+          - "/aws-content-analysis-elasticsearch.template"
+      Parameters:
+        AnalyticsStreamArn:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:AnalyticsStreamArn"
+        MieDataplaneBucket:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:DataplaneBucket"
 
-  WebsiteHelperRole:
-    Type: AWS::IAM::Role
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W11
-            reason: "Website helper Lambda requires ability to read / write to both MIE website bucket and MIE build bucket"
-    DependsOn: MediaInsightsWebsiteBucket
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Policies:
-        - PolicyName: !Sub "${AWS::StackName}-WebsiteHelperS3Access"
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "s3:GetObject"
-                  - "s3:PutObject"
-                  - "s3:ListBucket"
-                Resource:
-                  - !Sub ${MediaInsightsWebsiteBucket.Arn}/*
-                  - Fn::Sub:
-                      - arn:aws:s3:::${websitecode}/*
-                      - websitecode: !FindInMap ["SourceCode", "General", "S3Bucket"]
-              - Effect: Allow
-                Action:
-                  - "s3:ListBucket"
-                Resource:
-                  - !Sub ${MediaInsightsWebsiteBucket.Arn}
-                  - Fn::Sub:
-                      - arn:aws:s3:::${websitecode}
-                      - websitecode: !FindInMap ["SourceCode", "General", "S3Bucket"]
-              - Effect: Allow
-                Action:
-                  - "logs:CreateLogGroup"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
-                Resource:
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+  # Deploy Auth stack
 
-  WebsiteDeployHelper:
-    Type: AWS::Lambda::Function
+  ContentAnalysisAuthStack:
+    Type: "AWS::CloudFormation::Stack"
     Properties:
-      Code:
-        S3Bucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
-        S3Key:
-          !Join [
-            "/",
-            [
-            !FindInMap ["SourceCode", "General", "CodeKeyPrefix"],
-            "websitehelper.zip",
-            ],
-          ]
-      Handler: website_helper.lambda_handler
-      MemorySize: 256
-      Role: !GetAtt WebsiteHelperRole.Arn
-      Runtime: python3.6
-      Timeout: 900
-      Environment:
-        Variables:
-          DataplaneEndpoint: !Ref DataplaneEndpoint
-          WorkflowEndpoint: !Ref WorkflowEndpoint
-          ElasticEndpoint: !Ref ElasticEndpoint
-          DataplaneBucket: !Ref DataplaneBucket
-          UserPoolId: !Ref UserPoolId
-          IdentityPoolId: !Ref IdentityPoolId
-          AwsRegion: !Ref AWS::Region
-          PoolClientId: !Ref PoolClientId
+      TemplateURL: !Join
+        - ""
+        - - "https://"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - S3Bucket
+          - .s3-
+          - !Ref AWS::Region
+          - ".amazonaws.com/"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - TemplateKeyPrefix
+          - "/aws-content-analysis-auth.template"
+      Parameters:
+        AdminEmail: !Ref AdminEmail
+        WorkflowAPIRestID:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:WorkflowApiId"
+        DataplaneAPIRestID:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:DataplaneApiId"
+        ElasticDomainArn: !GetAtt ContentAnalysisElasticsearchStack.Outputs.DomainArn
+        DataplaneBucket:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:DataplaneBucket"
 
-  CopyWebSource:
-    DependsOn: MediaInsightsWebsiteBucket
-    Type: Custom::WebsiteDeployHelper
+  ContentAnalysisWebStack:
+    Type: "AWS::CloudFormation::Stack"
+    DependsOn: StringFunctions
     Properties:
-      ServiceToken: !GetAtt WebsiteDeployHelper.Arn
-      WebsiteCodeBucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
-      WebsiteCodePrefix: !FindInMap ["SourceCode", "General", "WebsitePrefix"]
-      DeploymentBucket: !GetAtt MediaInsightsWebsiteBucket.DomainName
+      TemplateURL: !Join
+        - ""
+        - - "https://"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - S3Bucket
+          - .s3-
+          - !Ref AWS::Region
+          - ".amazonaws.com/"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - TemplateKeyPrefix
+          - "/aws-content-analysis-web.template"
+      Parameters:
+        DataplaneEndpoint:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:DataplaneApiId"
+        WorkflowEndpoint:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:WorkflowApiId"
+        ElasticEndpoint: !GetAtt ContentAnalysisElasticsearchStack.Outputs.ElasticEndpoint
+        DataplaneBucket:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:DataplaneBucket"
+        UserPoolId: !GetAtt ContentAnalysisAuthStack.Outputs.UserPoolId
+        IdentityPoolId: !GetAtt ContentAnalysisAuthStack.Outputs.IdentityPoolId
+        PoolClientId: !GetAtt ContentAnalysisAuthStack.Outputs.UserPoolClientId
 
-  MediaInsightsOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub "access-identity-${MediaInsightsWebsiteBucket}"
+  # Deploy workflow
 
-  MediaInsightsWebsiteBucketPolicy:
-    Type: "AWS::S3::BucketPolicy"
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: F16
-            reason: "website bucket policy requires a wildcard principal"
+  KitchenSinkWorkflow:
+    Type: "AWS::CloudFormation::Stack"
     Properties:
-      Bucket:
-        Ref: "MediaInsightsWebsiteBucket"
-      PolicyDocument:
-        Statement:
-          - Effect: "Allow"
-            Action:
-              - "s3:GetObject"
-            Resource:
-              - !Sub "arn:aws:s3:::${MediaInsightsWebsiteBucket}/*"
-            Principal:
-              CanonicalUser: !GetAtt MediaInsightsOriginAccessIdentity.S3CanonicalUserId
+      TemplateURL: !Join
+        - ""
+        - - "https://"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - S3Bucket
+          - .s3-
+          - !Ref AWS::Region
+          - ".amazonaws.com/"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - TemplateKeyPrefix
+          - "/aws-content-analysis-workflow.template"
+      Parameters:
+        WorkflowCustomResourceArn:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:WorkflowCustomResourceArn"
+        OperatorLibraryStack:
+          Fn::ImportValue:
+            !Sub "${MieStackName}:OperatorLibraryStack"
 
-  MediaInsightsWebsiteDistribution:
-    Type: AWS::CloudFront::Distribution
+  # Custom resources
+
+  StringFunctions:
+    Type: "AWS::CloudFormation::Stack"
     Properties:
-      DistributionConfig:
-        Comment: "Website distribution for Media Insights Engine"
-        Logging:
-          Bucket: !Sub "${MediaInsightsWebsiteBucket}.s3.amazonaws.com"
-          Prefix: cf_logs/
-          IncludeCookies: true
-        Origins:
-          - Id: S3-solution-website
-            DomainName: !Sub "${MediaInsightsWebsiteBucket}.s3.${AWS::Region}.amazonaws.com"
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${MediaInsightsOriginAccessIdentity}"
-        DefaultCacheBehavior:
-          TargetOriginId: S3-solution-website
-          AllowedMethods:
-            - GET
-            - HEAD
-            - OPTIONS
-            - PUT
-            - POST
-            - DELETE
-            - PATCH
-          CachedMethods:
-            - GET
-            - HEAD
-            - OPTIONS
-          ForwardedValues:
-            QueryString: false
-          ViewerProtocolPolicy: redirect-to-https
-        DefaultRootObject: "index.html"
-        CustomErrorResponses:
-          - ErrorCode: 404
-            ResponsePagePath: "/index.html"
-            ResponseCode: 200
-          - ErrorCode: 403
-            ResponsePagePath: "/index.html"
-            ResponseCode: 200
-        IPV6Enabled: true
-        ViewerCertificate:
-          CloudFrontDefaultCertificate: true
-        Enabled: true
-        HttpVersion: 'http2'
+      TemplateURL: !Join
+        - ""
+        - - "https://"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - S3Bucket
+          - .s3-
+          - !Ref AWS::Region
+          - ".amazonaws.com/"
+          - !FindInMap
+            - ContentAnalysisApp
+            - SourceCode
+            - TemplateKeyPrefix
+          - "/string.template"
 
 Outputs:
-  CloudfrontUrl:
-    Value: !Join ["", ["https://", !GetAtt MediaInsightsWebsiteDistribution.DomainName]]
+  ContentAnalyisSolution:
+    Value: !GetAtt ContentAnalysisWebStack.Outputs.CloudfrontUrl
