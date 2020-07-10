@@ -26,7 +26,7 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         cd deployment
-        ./build-s3-dist.sh $build_bucket-us-west-2 $commit_id us-west-2
+        ./build-s3-dist.sh "6956-4998-6254-media-insights-build" default
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
