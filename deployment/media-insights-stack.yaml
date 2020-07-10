@@ -63,10 +63,10 @@ Parameters:
   DeployComprehendWorkflow:
     Description: Deploy a Comprehend Workflow which takes text as input and identifies key entities and phrases
     Type: String
-    Default: No
+    Default: "No"
     AllowedValues:
-      - Yes
-      - No
+      - "Yes"
+      - "No"
   DeployKitchenSinkWorkflow:
     Description: Deploy the Kitchen Sink Workflow which contains all MIE operators.
     Type: String
