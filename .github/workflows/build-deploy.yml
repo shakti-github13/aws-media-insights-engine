@@ -22,13 +22,8 @@ jobs:
         python-version: '3.7.x'
     - name: Install dependencies
       run: |
-        yum install -y findutils wget unzip zip
         python3.7 -m pip install chalice
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        ./aws/install
         python -m pip install --upgrade pip
-        pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         cd deployment
         ./build-s3-dist.sh $build_bucket-us-west-2 $commit_id us-west-2
