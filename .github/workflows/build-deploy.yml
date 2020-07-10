@@ -33,4 +33,10 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         cd deployment
         ./build-s3-dist.sh 6956-4998-6254-media-insights-build default us-east-1
-         ./run-unit-tests.sh
+     - name: AWS CloudFormation "Deploy CloudFormation Stack" Action for GitHub Actions
+       uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
+       with:
+        name: mie
+        template: s3://6956-4998-6254-media-insights-build/media-insights-solution/default/cf/media-insights-stack.template
+        parameter-overrides: "AdminEmail=jonathon.frame@acloud.guru,DeployComprehendWorkflow=Yes"
+        capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND"
