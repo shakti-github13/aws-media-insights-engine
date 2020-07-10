@@ -20,13 +20,17 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.7.x'
-    - name: Install dependencies
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: Setup Env Build and Test
       run: |
         python3.7 -m pip install chalice
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         cd deployment
         ./build-s3-dist.sh 6956-4998-6254-media-insights-build default us-east-1
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         ./run-unit-tests.sh
