@@ -37,6 +37,6 @@ jobs:
       uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
       with:
         name: mie
-        template: s3://6956-4998-6254-media-insights-build/media-insights-solution/default/cf/media-insights-stack.template
+        template: https://6956-4998-6254-media-insights-build.s3-ap-southeast-2.amazonaws.com/media-insights-solution/default/cf/media-insights-stack.template
         parameter-overrides: "AdminEmail=jonathon.frame@acloud.guru,DeployComprehendWorkflow=Yes"
         capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND"
