@@ -660,7 +660,7 @@ Resources:
           OPERATOR_NAME: "comprehendStartEntityDetection"
           DataplaneEndpoint: !Ref "DataPlaneEndpoint"
           comprehendRole: !GetAtt comprehendS3Role.Arn
-          entityRecognizerArn: !!Ref "entityRecognizerArn"
+          entityRecognizerArn: !Ref "entityRecognizerArn"
           botoConfig: '{"user_agent": "aws-tm-mie/python3.7/lambda"}'
 
 
