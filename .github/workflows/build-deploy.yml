@@ -40,3 +40,4 @@ jobs:
         template: https://acg-media-insights-build.s3.amazonaws.com/media-insights-solution/default/cf/media-insights-stack.template
         parameter-overrides: AdminEmail=jonathon.frame@acloud.guru,DeployComprehendWorkflow=Yes
         capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND"
+        notification-arns: "arn:aws:sns:us-east-1:188417097137:mie-cfn-updates"
