@@ -1,0 +1,118 @@
+Okay, hello, Cloud Gurus
+and welcome to this lecture.
+In this lecture, we're going to look
+at Amazon FSx for Windows
+and Amazon FSx for Lustre.
+So let's start with Amazon FSx for Windows File Server.
+It basically provides a fully managed
+native Microsoft Windows file system
+so you can easily move your Windows-based applications
+that require file storage to AWS.
+And Amazon FSx is built on Windows Server.
+So essentially it's a Windows file server
+and that's really all it is
+and it's really designed
+for use with Microsoft applications,
+so things like SQL Server, Active Directory,
+IIS, SharePoint, et cetera.
+So how is it different to EFS?
+Well, Windows FSx is a managed Windows server
+that runs Windows Server Message Block
+so SMB-based file services.
+It's designed for Windows applications like I just said
+or designed for Microsoft applications
+and it supports AD users, access control lists,
+groups and security policies
+along with Distributed File System namespaces,
+DFS namespaces and replication.
+So if you have an exam question that's asking you
+what storage you should choose
+and it's SMB based, Server Message Block based,
+then you're gonna go for Windows FSx
+because EFS is not SMB based.
+EFS is a managed NAS filer for EC2 instances
+and it's based on the Network File System Protocol.
+NFS version 4.
+So NFS version 4 for EFS.
+And it was one of the first network file sharing protocols
+native to Unix and Linux
+and Amazon do not support EC2 instances
+that are running Windows
+to connect to EFS, it's Linux only.
+So it's pretty simple.
+When would you choose Windows FSx?
+Is if you need SMB-based file services,
+if you're running Microsoft applications.
+You choose EFS if you are doing Linux
+and you need shared storage.
+And then we're moving onto Amazon FSx for Lustre.
+This is a fully managed file system
+that's optimized for computer-intensive workloads,
+such as high-performance computing,
+machine learning,
+media and data processing of our workflows
+and electronic design automation or EDA.
+Now, with Amazon FSx,
+you can launch and run Lustre file systems
+that can process massive datasets,
+up to hundreds of gigabytes per second of throughput,
+millions of IOPS and sub-millisecond latencies.
+So again, where you would choose this
+is if you're doing exactly that.
+If you're processing large datasets
+with up to hundreds of gigabits per second
+and you need that kind of throughput
+or millions of IOPS or sub-millisecond latencies.
+So think basically big data, machine learning,
+high-performance computing, et cetera, et cetera.
+That's when you'd use Amazon FSx for Lustre.
+You'd use Amazon FSx for Windows
+when you're using Windows applications
+and if you just need shared storage for Linux,
+you would use EFS.
+So how is Lustre FSx different to EFS?
+Well, it's specifically designed for processing workloads
+such as machine learning,
+high-performance compute, video processing,
+financial modeling and electronic design automation.
+And lets you launch and run a file system
+that provides sub-millisecond access
+to your data and allows you to read
+and write data of speeds of up to hundreds
+of gigabits per second of throughput
+and millions of IOPS.
+Whereas EFS, as like I said before,
+is a managed NAS filer.
+It's running the Network File System version 4 protocol
+and it's one of the first network file sharing protocols
+that was native to Unix and Linux.
+So onto my exam tips.
+In the exam, you're gonna be given a whole bunch
+of different scenarios
+and asked to choose whether you should be using EFS,
+FSx for Windows and FSx for Lustre.
+EFS, you use this
+when you need distributed highly resilient storage for Linux
+and instances in Linux-based applications.
+Amazon FSx for Windows
+is when you need centralized storage
+for Windows-based applications
+such as SharePoint, SQL Server,
+workspaces, IIS web server
+or any other native Microsoft application
+and if you see the phrase SMB,
+you need SMB storage,
+then you're going to use Amazon FSx for Windows.
+And then finally, if you're doing big data,
+so you want to look at Amazon FSx for Lustre.
+So this is when you need high speed,
+high capacity distributed storage.
+This'll be for applications
+that do high performance compute,
+financial modeling, et cetera.
+Remember that that FSx for Lustre can store data directly
+on S3 as well.
+So that is it for this lecture, everyone.
+If you have any questions,
+please let me know, if not, feel free
+to move on to the next lecture, thank you.

@@ -1,0 +1,108 @@
+Okay, hello, Cloud Gurus,
+and welcome to this lecture.
+In this lecture, we're going to look at instance metadata.
+So, in the last lecture we looked at bootstrap scripts,
+and we passed it some user data.
+We can actually go into our EC2 instance,
+and look at this user data as well as instance metadata.
+So, what I want you to do
+is to SSH into your EC2 instance.
+Okay, so I'm in my EC2 instance.
+I've elevated my privileges to root.
+I'm just going to clear the screen,
+so it looks clean.
+And then what I want to do is I'm going to run
+the "curl" command, and then I'm going to do it
+to this IP address.
+So, we're going to go to 169.254.
+.169.254.
+Then forward slash "latest", and then forward slash,
+and then we'll do "user-data".
+And there you go, you can actually see
+our bootstrap script.
+It's all these lines here.
+So this is what we passed to it, when it first booted up.
+And if you hit "up" again, and go all the way
+to the end of the command, then we can output
+this to "bootstrap.txt".
+And if we type now "cat bootstrap.txt",
+we'll be able to see that we've created
+a file called "bootstrap.txt",
+and we've passed our bootstrap script that was
+saved in our user data, to bootstrap.txt.
+And you can actually see the file in there.
+So, let's clear the screen.
+So, that's a way of passing our bootstrap script
+to our EC2 instance, and then having
+our EC2 instance remember it.
+You can use the curl command to do that.
+Another thing we can use the curl command,
+is to get the data on our individual EC2 instance.
+So, again, we're going to go to "http",
+and we're going to go to 169
+.254.169
+.254.
+And then forward slash "latest"
+and then this time instead of saying "user-data",
+we want to see "meta-data".
+And then forward slash.
+And it'll give you a whole bunch of different options.
+So, let's say we wanted to get our IPv4.
+If we hit the "up" button again,
+and we go all the way to the end,
+and then now just type "local" and then hyphen,
+and then "ipv4".
+And you can see my local IP address there.
+So, it's my 172.31.22
+.213.
+I can also do it for my public IP.
+So, instead of saying "local" IP,
+we want "public" and then hyphen "ipv4".
+And there you go, there's my public IP address.
+And likewise, I can output this data into a text file.
+So, I could call it "myip.txt",
+".txt".
+And if we now do "ls", we can see
+that we've got "myip.txt".
+If I "cat" that, so my "myip.txt",
+I'll be able to see the IP address in there.
+And what I could do is
+have a bootstrap script that runs this,
+gets the public IP, writes it to a file,
+then automatically copies it over to S3.
+That could then trigger a lambda function,
+and I know we haven't covered off lambda yet,
+but we'll get to that in a few sections of the course.
+And then you could basically store that IP address
+in a database.
+So you could write it directly to a database
+from your EC2 instance.
+So, there's lots of things you can do
+using the curl command, and lots of data
+that you can get.
+And just to see it all, all you need to do
+is just type in "curl", and then go "curl hcv 169
+.254 169.254
+forward slash "meta-data", and then just hit "Enter",
+and you'll be able to see all the various
+different options there.
+So, what are my exam tips?
+Just remember, that metadata is used
+to get information about an instance,
+such as its public IP.
+And you can do that by running this command.
+So "curl http 169.254
+"169.254"
+forward slash "latest", forward slash "meta-data".
+And then you can also get your user data,
+and your user data will simply contain
+the bootstrap script that you ran,
+and that's what's passed to it,
+when it is first provisioned.
+And you can get that running the curl command.
+So "169 254 169
+"254", forward slash 'latest",
+forward slash "user-data".
+So, that is it for this lecture, guys.
+If you have any questions, please let me know.
+If not, feel free to move on to the next lecture, thank you.

@@ -1,0 +1,76 @@
+[Ryan] Okay, hello Cloud Gurus and welcome to this lecture.
+This lecture is on ElastiCache
+and this is the last database service we need to cover
+in this section of the course
+before we move on to our summary
+and then we can move on and learn all about
+Route 53 and networking.
+So, what is ElastiCache?
+And we did cover this off in the database 101 lecture.
+But basically it's a web service that makes it easy
+to deploy, operate and scale in-memory caching in the cloud
+and the service improves the performance of web applications
+by allowing you to retrieve information from fast managed
+in-memory caches instead of relying
+on slower disk-based databases.
+So what does that actually mean?
+Well, essentially if you go to
+let's say Amazon.com and you've got
+you go into, I don't know, the technology department
+and you see the ten top most purchased items.
+What essentially is happening there is the EC2 instances.
+They aren't making those queries back to an Aurora database.
+What they're actually doing is they're making those queries
+back to ElastiCache and ElastiCache is storing those queries
+in there and it helps take off some of the performance
+impact because you're not constantly querying with your main
+production database for the same queries.
+So you're going to cache your most-queried information
+in ElastiCache.
+ElastiCache supports two open source caching engines.
+So we've got Memcached and Redis.
+So what is the difference between a Memcached and Redis
+and when should you use one over the other?
+Well if you just want a really simple cache to offload
+your database then you definitely want to use Memcached.
+It's able to scale horizontally
+and you get multithreaded performance.
+If, however, you're going to need things like
+advanced data types,
+if you're going to need ranking and sorting datas,
+if you're going to need Pub/Sub
+so publishing and subscribing capabilities.
+If you need multiple availability zones or persistence
+or you need the ability to do Backup &amp; Restores
+then you're going to use Redis.
+So if you want Multi-AZ, Backups &amp; Restores
+and its more sort of advanced data types
+then you're going to use Redis.
+If you just want something simple
+and easy to get started with then you want Memcached.
+So, on to my exam tips.
+Just remember the main thing you need to really understand
+going into the Certified Solutions Architect Associate exam
+is the use case for ElastiCache.
+So it's used to increase your database and web application
+performance and common exam scenarios will be
+"Hey, your database is overloaded.
+"What two steps could you take to
+"make this database perform better?"
+One is to add a Read Replica
+and then point your reads to your Read Replicas.
+And then the other is to use ElastiCache.
+At the Certified Solutions Architect Associate level
+you're not really required to know the difference
+between Memcached and Redis but you definitely
+need to know it going
+into the Certified Solutions Architect Professional exam.
+Just remember that Redis is Multi-AZ
+and you can do Backups &amp; Restores of Redis.
+So that is it for this lecture, everyone.
+If you have any questions, please let me know.
+If not, feel free to move on to the next lecture
+where were going to summarize everything we've learned
+in the databases section and then that is it for databases.
+So if you've got the time
+please join me in the next lecture. Thank you.

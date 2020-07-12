@@ -1,0 +1,171 @@
+Okay, hello cloud gurus
+and welcome to this lecture.
+In this lecture, we're going to talk
+about EC2 Placement Groups.
+So congratulations,
+you're almost at the end of the EC2 section of the course.
+You've done really,
+really well.
+Hopefully, you've learned an awful lot
+and had an awful lot of fun.
+In this one,
+it's just a pure theoretical lecture,
+EC2 Placement Groups do come up on the exam.
+There used to be only one type of placement group,
+and that used to be very popular exam topic.
+Now, there's three different two types of placement groups,
+and you will need to understand what they are going
+into your exam and the differences between the three.
+So what is a placement group or an EC2 Placement Group?
+Well, it's pretty obvious from the name actually,
+it's just a way of placing your EC2 instances.
+And there's three different types of placement groups.
+So we have our clustered placement groups,
+our spread placement groups,
+and then our partitioned placement group.
+And we'll go through each one individually.
+We'll start off with the easiest.
+So clustered placement groups is basically a grouping
+of instances within a single availability zone.
+Placement groups are recommended for applications
+that need low network latency,
+high network throughput or both.
+So essentially,
+it's a way of putting your EC2 instances very,
+very close to each other
+so that you have very low network latency.
+And you can also have very,
+very high network throughput.
+So that's all it is.
+It's a way of grouping your EC2 instances very,
+very close together within a single availability zone.
+And only certain instances can be launched
+into a clustered placement group.
+We then have our spread placement group
+and this is basically the opposite idea.
+So it's a group of instances
+that are each placed on distinct underlying hardware.
+These will be on separate racks with separate network inputs
+as well as a separate power requirements.
+So if you have one rack that fails,
+it's only gonna affect that one EC2 instance.
+So spread placement groups are recommended for applications
+that have small number of critical instances
+that should be kept separate from each other.
+And you can have spread placement groups,
+inside different availability zones within one region.
+And with a spread placement group,
+I want you to think of individual instances.
+So this individual EC2 instance is
+on this individual piece of hardware.
+And it's completely isolated
+from this individual EC2 instance,
+and this one et cetera.
+So if a rack does go through and fail,
+it's only going to affect the one instance.
+So that's all a spread placement group is,
+it's the sort of opposite of a clustered placement group,
+in that, you know,
+clustered placement group puts all your EC2 instances very,
+very close together,
+so you get really high performing network throughput
+as well as low latency,
+whereas spread placement groups are designed
+to protect your EC2 instances from hardware failure,
+but its individual instances put
+on individual racks inside either the same availability zone
+or different availability zones depending
+on how you configure it.
+We then have partition placement groups which are very,
+very similar to spread placement groups,
+except you can have multiple EC2 instances
+within a partition.
+So when using partition placement groups,
+Amazon EC2 divides each group
+into logical segments called partitions,
+and Amazon EC2 ensures
+that each partition within a placement group
+is on its own set of racks.
+And each rack has its own network and power source,
+and no two partitions within the placement groups
+share the same racks,
+allowing you to isolate the impact
+of hardware failure within your application.
+So if you go through and read the documentation,
+it does take a little while get your head around
+the difference between a spread placement group
+and a partition placement group.
+And basically the difference is,
+is you can have multiple instances
+in a partitioned placement group.
+So you can have multiple instances on this rack
+and you can have multiple instances on this rack,
+and this rack is completely separate to this rack.
+So EC2 instances are basically sitting on partition one
+and then you've got a whole bunch
+of EC2 instances sitting on partition two.
+That's a partitioned placement group.
+But if you dealing with individual EC2 instances,
+then that's a spread placement group.
+So a spread placement group is for single instance,
+partition placement groups are for multiple instances,
+and then your clustered placement groups are just a way
+of putting everything as close together as possible.
+So onto my exam tips,
+just remember the three different types of placement groups.
+So we've got our clustered placement groups,
+our spread placement groups,
+and our partition placement groups.
+So what is the use case for a clustered placement group?
+Well it's for low network latency
+and high network throughput.
+So you want your EC2 instances to be as close
+to each other as possible,
+they'll always be in the same availability zone
+in the same region.
+Our spread placement group is where we've got individual,
+critical EC2 instances,
+and we need them to be on separate pieces of hardware.
+So if one piece of hardware fails,
+it's going to isolate that EC2 instance,
+it's not going to knock out two EC2 instances at once,
+it's only gonna be that one EC2 instance.
+So that's all a spread placement group is
+and then partitioned is for multiple EC2 instances.
+So use cases for this could be HDFS,
+HBase and Cassandra clusters.
+So partitioned is basically just multiple EC2 instances,
+whereas spread is individual critical EC2 instances.
+A clustered placement group can't span multiple
+availability zones,
+whereas a spread placement
+and partitioned placement group can,
+but they still have to be within the same region.
+The name that you specify
+for a placement group must be unique
+within your AWS account.
+Only certain types of instances can be launched
+in placement groups.
+So these are things like compute optimized GPU,
+memory optimized and storage optimized as well.
+AWS recommend homogenous instances,
+within clustered placement groups.
+So if you are doing a clustered placement group,
+you want to have the same EC2 instance types inside
+that clustered placement group or at least
+that's Amazon's recommendation.
+You can't merge placement groups
+and you can move an existing instance
+into a placement group,
+but before you move the instance,
+the instance must be in the stop state.
+And you can move or remove an instance using the AWS-CLI
+or SDK, but you can't do it via the console just yet.
+So that is it for this lecture, everyone.
+We're almost at the end of the course.
+In the next lecture we're just gonna have a quick look
+at Amazon's web application firewall or WAF,
+and then we're gonna summarize everything
+that we've learned in this section of the course.
+So if you've got the time,
+please join me in the next lecture, thank you.
