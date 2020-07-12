@@ -5,6 +5,7 @@ Parameters:
   GITHUBSHA:
     Type: "String"
     Description: "SHA of GitHub Commit"
+    Default: ""
   KinesisShardCount:
     Type: Number
     Default: 1
