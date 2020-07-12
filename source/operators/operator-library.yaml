@@ -11,6 +11,9 @@ Parameters:
   DataPlaneEndpoint:
     Type: "String"
     Description: "Name of the dataplane handler lambda function"
+  entityRecognizerArn:
+      Type: "String"
+      Description: "Name of the custom entity recognizer for AWS Services"
   DataPlaneBucket:
     Type: "String"
     Description: "Bucket for the dataplane"
@@ -632,6 +635,7 @@ Resources:
           comprehendRole: !GetAtt comprehendS3Role.Arn
           botoConfig: '{"user_agent": "aws-tm-mie/python3.7/lambda"}'
 
+
   startEntityDetection:
     Type: "AWS::Lambda::Function"
     Properties:
@@ -656,7 +660,9 @@ Resources:
           OPERATOR_NAME: "comprehendStartEntityDetection"
           DataplaneEndpoint: !Ref "DataPlaneEndpoint"
           comprehendRole: !GetAtt comprehendS3Role.Arn
+          entityRecognizerArn: !!Ref "entityRecognizerArn"
           botoConfig: '{"user_agent": "aws-tm-mie/python3.7/lambda"}'
+
 
   getEntityDetection:
     Type: "AWS::Lambda::Function"

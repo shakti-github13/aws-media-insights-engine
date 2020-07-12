@@ -23,6 +23,10 @@ aws comprehend create-entity-recognizer \
      --input-data-config "EntityTypes=[{Type=AWS_SERVICE}],Documents={S3Uri=s3://acg-media-insights-modelfiles/comprehend/aws_services_entity_recogniser/trainingfiles/},EntityList={S3Uri=s3://acg-media-insights-modelfiles/comprehend/aws_services_entity_recogniser/trainingfiles/awsservices.csv}" \
      --region us-east-1 --profile acg_media_insights
 
+# write the arn of the custom entity recognizer to the parameter store - this will be used by the media-insights-stack to apply this custom entity recogniser to the transcripts of videos
+aws ssm put-parameter --name "/mie/comprehend/customAWSEntityRecognizer" --value {{ARN of custom recognizer}} --type String --profile acg_media_insights
+
+e.g. aws ssm put-parameter --name "/mie/comprehend/customAWSEntityRecognizer" --value "arn:aws:comprehend:us-east-1:188417097137:entity-recognizer/AWS-Service-Recognizer" --type String --profile acg_media_insights
 
 #Output: 
 #arn:aws:comprehend:us-east-1:188417097137:entity-recognizer/AWS-Service-Recognizer

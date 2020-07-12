@@ -14,6 +14,8 @@ config = config.Config(**mie_config)
 comprehend = boto3.client('comprehend', config=config)
 s3 = boto3.client('s3')
 comprehend_role = os.environ['comprehendRole']
+s3 = boto3.client('s3')
+entity_recognizer_arn = os.environ['entityRecognizerArn']
 region = os.environ['AWS_REGION']
 headers = {"Content-Type": "application/json"}
 
@@ -80,6 +82,7 @@ def lambda_handler(event, context):
             },
             DataAccessRoleArn=comprehend_role,
             JobName=workflow_id,
+            EntityRecognizerArn=entity_recognizer_arn,
             LanguageCode="en"
         )
     except Exception as e:

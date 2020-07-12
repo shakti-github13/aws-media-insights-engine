@@ -67,6 +67,12 @@ Parameters:
     AllowedValues:
       - "Yes"
       - "No"
+      
+  EntityRecogniserArn:
+    Description: Custom Comprehend Entity Recogniser Arn (from param store) to use when running entity detection
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: '/mie/comprehend/customAWSEntityRecognizer'
+
   DeployKitchenSinkWorkflow:
     Description: Deploy the Kitchen Sink Workflow which contains all MIE operators.
     Type: String
@@ -1260,6 +1266,7 @@ Resources:
         DataPlaneEndpoint: !GetAtt MediaInsightsDataplaneApiStack.Outputs.APIHandlerName
         DataPlaneHandlerArn: !GetAtt MediaInsightsDataplaneApiStack.Outputs.APIHandlerArn
         DataPlaneBucket: !Ref Dataplane
+        entityRecognizerArn: !Ref EntityRecogniserArn
         MediaInsightsEnginePython37Layer: !Ref MediaInsightsEnginePython37Layer
         MediaInsightsEnginePython36Layer: !Ref MediaInsightsEnginePython36Layer
 
