@@ -3,6 +3,10 @@ Description: "Media Insights Engine - Workflow to run Instant Translate"
 
 Parameters:
 
+  GitHub_SHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
+
   WorkflowCustomResourceArn:
     Type: String
     Description: "ARN of the Media Insights custom resource that handles creating operations, stages and workflows"

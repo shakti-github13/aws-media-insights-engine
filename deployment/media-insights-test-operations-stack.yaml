@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Media Insights Engine - Test operators, stages, and workflows
 
 Parameters:
+  GitHub_SHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
   WorkflowCustomResourceArn:
     Type: String
     Description: "ARN of the Media Insights custom resource that handles creating operations, stages and workflows"

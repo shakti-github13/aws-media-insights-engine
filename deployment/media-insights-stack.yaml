@@ -5,7 +5,9 @@ Parameters:
   AdminEmail:
     Description: Email address for the MIE Administrator
     Type: String
-
+  GitHub_SHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
   DevGroupName:
     Type: String
     Description: Name of the developer group
@@ -107,6 +109,7 @@ Metadata:
       - Label:
           default: System Configuration
         Parameters:
+          - GitHub_SHA
           - AdminEmail
           - MaxConcurrentWorkflows
       - Label:
@@ -1138,6 +1141,7 @@ Resources:
       Parameters:
         DataplaneTableName: !Ref DataplaneTable
         DataplaneBucketName: !Ref Dataplane
+        GitHub_SHA: !Ref GitHub_SHA
         UserPoolArn: !GetAtt MieUserPool.Arn
         DeploymentPackageBucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         DeploymentPackageKey:
@@ -1167,6 +1171,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         DynamoStreamArn:
           Fn::GetAtt:
             - DataplaneTable
@@ -1191,6 +1196,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         UserPoolArn: !GetAtt MieUserPool.Arn
         StageExecutionQueueUrl: !Ref StageExecutionQueue
         StageExecutionRole: !GetAtt StepFunctionRole.Arn
@@ -1259,6 +1265,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1289,6 +1296,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1320,6 +1328,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1369,6 +1378,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1394,6 +1404,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1419,6 +1430,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1462,6 +1474,7 @@ Resources:
           ],
         ]
       Parameters:
+        GitHub_SHA: !Ref GitHub_SHA
         DataplaneEndpoint: !GetAtt MediaInsightsDataplaneApiStack.Outputs.EndpointURL
         WorkflowEndpoint: !GetAtt MediaInsightsWorkflowApi.Outputs.EndpointURL
         ElasticEndpoint: !GetAtt Analytics.Outputs.ElasticUrl
