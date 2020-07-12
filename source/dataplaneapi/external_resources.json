@@ -1,5 +1,9 @@
 {
   "Parameters": {
+    "GITHUBSHA": {
+      "Type": "String",
+      "Description": "GitHub Commit Sha"
+    },
     "DataplaneTableName": {
       "Type": "String",
       "Description": "Table used for storing asset metadata"
