@@ -8,6 +8,10 @@ Mappings:
       KeyPrefix: "media-insights-solution/%%VERSION%%/code"
 
 Parameters:
+  GITHUBSHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
+    Default: ""
   DataPlaneEndpoint:
     Type: "String"
     Description: "Name of the dataplane handler lambda function"

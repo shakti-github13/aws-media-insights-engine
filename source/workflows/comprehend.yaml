@@ -5,6 +5,7 @@ Parameters:
   GITHUBSHA:
     Type: "String"
     Description: "SHA of GitHub Commit"
+    Default: ""
     
   WorkflowCustomResourceArn:
     Type: String

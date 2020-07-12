@@ -2,10 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: "Media Insights Engine - Workflow to run Instant Translate"
 
 Parameters:
-
   GITHUBSHA:
     Type: "String"
     Description: "SHA of GitHub Commit"
+    Default: ""
 
   WorkflowCustomResourceArn:
     Type: String

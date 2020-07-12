@@ -8,6 +8,7 @@ Parameters:
   GITHUBSHA:
     Type: "String"
     Description: "SHA of GitHub Commit"
+    Default: ""
   DevGroupName:
     Type: String
     Description: Name of the developer group

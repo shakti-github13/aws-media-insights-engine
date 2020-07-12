@@ -5,6 +5,7 @@ Parameters:
   GITHUBSHA:
     Type: "String"
     Description: "SHA of GitHub Commit"
+    Default: ""
   WorkflowCustomResourceArn:
     Type: String
     Description: "ARN of the Media Insights custom resource that handles creating operations, stages and workflows"
