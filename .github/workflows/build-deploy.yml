@@ -32,10 +32,9 @@ jobs:
          python -m pip install --upgrade pip
          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
          cd deployment
+         ./build-s3-dist.sh acg-media-insights-build default us-east-1
      - name: AWS CloudFormation "Deploy CloudFormation Stack" Action for GitHub Actions
        uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
-       env:
-        SHA: ${{github.sha}}
        with:
          name: mie
          template: https://acg-media-insights-build.s3.amazonaws.com/media-insights-solution/default/cf/media-insights-stack.template
