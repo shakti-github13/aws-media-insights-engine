@@ -26,18 +26,22 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-    - name: Setup Env Build and Test
-      run: |
-        python3.7 -m pip install chalice
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        cd deployment
-        ./build-s3-dist.sh acg-media-insights-build default us-east-1
-    - name: AWS CloudFormation "Deploy CloudFormation Stack" Action for GitHub Actions
-      uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
-      with:
-        name: mie
-        template: https://acg-media-insights-build.s3.amazonaws.com/media-insights-solution/default/cf/media-insights-stack.template
-        parameter-overrides: AdminEmail=jonathon.frame@acloud.guru,DeployComprehendWorkflow=Yes,GITHUBSHA=${GITHUB_SHA}
-        capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND"
-        notification-arns: "arn:aws:sns:us-east-1:188417097137:mie-cfn-updates"
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+    # - name: Setup Env Build and Test
+    #   run: |
+    #     python3.7 -m pip install chalice
+    #     python -m pip install --upgrade pip
+    #     if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    #     cd deployment
+    #     ./build-s3-dist.sh acg-media-insights-build default us-east-1
+    # - name: AWS CloudFormation "Deploy CloudFormation Stack" Action for GitHub Actions
+    #   uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
+    #   with:
+    #     name: mie
+    #     template: https://acg-media-insights-build.s3.amazonaws.com/media-insights-solution/default/cf/media-insights-stack.template
+    #     parameter-overrides: AdminEmail=jonathon.frame@acloud.guru,DeployComprehendWorkflow=Yes,GITHUBSHA=${GITHUB_SHA}
+    #     capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND"
+    #     notification-arns: "arn:aws:sns:us-east-1:188417097137:mie-cfn-updates"
