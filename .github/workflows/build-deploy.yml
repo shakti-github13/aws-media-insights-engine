@@ -26,13 +26,6 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-        SHA: ${{github.sha}}
-      run: |
-        echo "$GITHUB_CONTEXT"
-        echo "$SHA"
      - name: Setup Env Build and Test
        run: |
          python3.7 -m pip install chalice
