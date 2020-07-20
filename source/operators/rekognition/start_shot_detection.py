@@ -51,7 +51,12 @@ def start_label_detection(bucket, key):
                 'SNSTopicArn': os.environ['REKOGNITION_SNS_TOPIC_ARN'],
                 'RoleArn': os.environ['REKOGNITION_ROLE_ARN']
             },
-            SegmentTypes=['SHOT']
+            SegmentTypes=['SHOT'],
+            Filters={
+                'ShotFilter': {
+                    'MinSegmentConfidence': 50
+                }
+            }
         )
         print('Job Id (shot_detection): ' + response['JobId'])
         return response['JobId']

@@ -38,12 +38,7 @@ def start_technical_cue_detection(bucket, key):
                 'SNSTopicArn': os.environ['REKOGNITION_SNS_TOPIC_ARN'],
                 'RoleArn': os.environ['REKOGNITION_ROLE_ARN']
             },
-            SegmentTypes=['SHOT'],
-            Filters={
-                'ShotFilter': {
-                    'MinSegmentConfidence': 0
-                }
-            }
+            SegmentTypes=['TECHNICAL_CUE']
         )
         print('Job Id (techncal_cue_detection): ' + response['JobId'])
         return response['JobId']
