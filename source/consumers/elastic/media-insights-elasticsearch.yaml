@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "Media Insights Engine - Elasticsearch Consumer stack"
 
 Parameters:
+  GITHUBSHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
+    Default: ""
   DeployElasticsearch:
     Type: String
     Description: "Would you like to deploy an Elasticsearch cluster?"

@@ -1,5 +1,9 @@
 {
   "Parameters": {
+    "GITHUBSHA": {
+      "Type": "String",
+      "Description": "GitHub Commit Sha"
+    },
     "DeploymentPackageBucket": {
       "Type": "String",
       "Description": "Bucket that contains the dataplane deployment package"

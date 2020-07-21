@@ -1,0 +1,341 @@
+Text,Type
+ 1-Click  ,AWS_SERVICE
+ Access Manager  ,AWS_SERVICE
+ ALB Application Load Balancer ,AWS_SERVICE
+ AMI,AWS_SERVICE
+ Amplify  ,AWS_SERVICE
+ Analytics  ,AWS_SERVICE
+ API Gateway  ,AWS_SERVICE
+ App Mesh  ,AWS_SERVICE
+ Application Discovery Service  ,AWS_SERVICE
+ AppStream,AWS_SERVICE
+ AppSync  ,AWS_SERVICE
+ Artifact  ,AWS_SERVICE
+ Athena  ,AWS_SERVICE
+ Aurora  ,AWS_SERVICE
+ Auto Scaling  ,AWS_SERVICE
+ AWS Organizations  ,AWS_SERVICE
+ Backup  ,AWS_SERVICE
+ Batch  ,AWS_SERVICE
+ Braket  ,AWS_SERVICE
+ Cassandra Service  ,AWS_SERVICE
+ Certificate Manager  ,AWS_SERVICE
+ Chatbot  ,AWS_SERVICE
+ Cloud Map  ,AWS_SERVICE
+ Cloud9  ,AWS_SERVICE
+ CloudFormation  ,AWS_SERVICE
+ CloudFront  ,AWS_SERVICE
+ CloudHSM  ,AWS_SERVICE
+ CloudSearch  ,AWS_SERVICE
+ CloudTrail  ,AWS_SERVICE
+ CloudWatch,AWS_SERVICE
+ CodeBuild,AWS_SERVICE
+ CodeCommit,AWS_SERVICE
+ CodeDeploy,AWS_SERVICE
+ CodeGuru,AWS_SERVICE
+ CodePipeline,AWS_SERVICE
+ CodeStar,AWS_SERVICE
+ Cognito  ,AWS_SERVICE
+ Comprehend  ,AWS_SERVICE
+ Compute Optimizer  ,AWS_SERVICE
+ Config  ,AWS_SERVICE
+ Container  ,AWS_SERVICE
+ Control Tower  ,AWS_SERVICE
+ Data Exchange  ,AWS_SERVICE
+ Data Pipeline  ,AWS_SERVICE
+ Database Migration Service  ,AWS_SERVICE
+ DataSync  ,AWS_SERVICE
+ DeepLens  ,AWS_SERVICE
+ Detective  ,AWS_SERVICE
+ Device Defender  ,AWS_SERVICE
+ Device Farm  ,AWS_SERVICE
+ Device Management  ,AWS_SERVICE
+ Direct Connect  ,AWS_SERVICE
+ DirectConnect  ,AWS_SERVICE
+ Directory Service  ,AWS_SERVICE
+ DocumentDB  ,AWS_SERVICE
+ Dynamo DB,AWS_SERVICE
+ EC2,AWS_SERVICE
+ EC2 Image Builder  ,AWS_SERVICE
+ ECR  ,AWS_SERVICE
+ ECS  ,AWS_SERVICE
+ EFS  ,AWS_SERVICE
+ EKS  ,AWS_SERVICE
+ Elastic Beanstalk  ,AWS_SERVICE
+ Elastic Transcoder  ,AWS_SERVICE
+ ElastiCache  ,AWS_SERVICE
+ Elasticsearch   ,AWS_SERVICE
+ Elemental   ,AWS_SERVICE
+ EMR  ,AWS_SERVICE
+ Encryption  ,AWS_SERVICE
+ Events  ,AWS_SERVICE
+ Forecast  ,AWS_SERVICE
+ Fraud Detector  ,AWS_SERVICE
+ FreeRTOS  ,AWS_SERVICE
+ FSx  ,AWS_SERVICE
+ GameLift  ,AWS_SERVICE
+ Global Accelerator  ,AWS_SERVICE
+ Glue  ,AWS_SERVICE
+ Greengrass  ,AWS_SERVICE
+ Ground Station  ,AWS_SERVICE
+ Guard Duty  ,AWS_SERVICE
+ GuardDuty  ,AWS_SERVICE
+ IAM  ,AWS_SERVICE
+ Inspector  ,AWS_SERVICE
+ Instance Type  ,AWS_SERVICE
+ IoT Core  ,AWS_SERVICE
+ IQ  ,AWS_SERVICE
+ Kendra  ,AWS_SERVICE
+ Key Management Service  ,AWS_SERVICE
+ Kinesis  ,AWS_SERVICE
+ Kinesis Video Streams  ,AWS_SERVICE
+ Lake Formation  ,AWS_SERVICE
+ Lambda  ,AWS_SERVICE
+ Launch Wizard  ,AWS_SERVICE
+ Lex  ,AWS_SERVICE
+ License Manager  ,AWS_SERVICE
+ Lightsail  ,AWS_SERVICE
+ Machine Learning  ,AWS_SERVICE
+ Macie  ,AWS_SERVICE
+ Managed Blockchain  ,AWS_SERVICE
+ Managed Services  ,AWS_SERVICE
+ MediaConnect  ,AWS_SERVICE
+ MediaConvert  ,AWS_SERVICE
+ MediaLive  ,AWS_SERVICE
+ MediaPackage  ,AWS_SERVICE
+ MediaStore  ,AWS_SERVICE
+ MediaTaylor  ,AWS_SERVICE
+ Metadata Service  ,AWS_SERVICE
+ Migration Hub  ,AWS_SERVICE
+ Mobile Hub  ,AWS_SERVICE
+ Monitoring  ,AWS_SERVICE
+ MSK  ,AWS_SERVICE
+ Neptune  ,AWS_SERVICE
+ OpsWorks  ,AWS_SERVICE
+ Oracle  ,AWS_SERVICE
+ Organizations  ,AWS_SERVICE
+ Outposts  ,AWS_SERVICE
+ Personal Health Dashboard  ,AWS_SERVICE
+ Personalize  ,AWS_SERVICE
+ Polly  ,AWS_SERVICE
+ QLDB  ,AWS_SERVICE
+ QuickSight  ,AWS_SERVICE
+ RDS  ,AWS_SERVICE
+ Redshift  ,AWS_SERVICE
+ Rekognition  ,AWS_SERVICE
+ RoboMaker  ,AWS_SERVICE
+ Route53  ,AWS_SERVICE
+ S3,AWS_SERVICE
+ S3 Glacier  ,AWS_SERVICE
+ SageMaker  ,AWS_SERVICE
+ Secrets Manager  ,AWS_SERVICE
+ Security Hub  ,AWS_SERVICE
+ Server Migration Service  ,AWS_SERVICE
+ Serverless Application Repository  ,AWS_SERVICE
+ Service Catalog  ,AWS_SERVICE
+ Shield  ,AWS_SERVICE
+ Single Sign-On  ,AWS_SERVICE
+ SiteWise  ,AWS_SERVICE
+ Snowball  ,AWS_SERVICE
+ SSO  ,AWS_SERVICE
+ Step Function  ,AWS_SERVICE
+ Storage Gateway  ,AWS_SERVICE
+ Support  ,AWS_SERVICE
+ Systems Manager  ,AWS_SERVICE
+ Tags  ,AWS_SERVICE
+ Textract  ,AWS_SERVICE
+ Things Graph  ,AWS_SERVICE
+ Transcribe  ,AWS_SERVICE
+ Transfer for SFTP  ,AWS_SERVICE
+ Translate  ,AWS_SERVICE
+ Trusted Advisor  ,AWS_SERVICE
+ VPC  ,AWS_SERVICE
+ VPN  ,AWS_SERVICE
+ WAF  ,AWS_SERVICE
+ Well-Architected Tool  ,AWS_SERVICE
+ WorkDocs  ,AWS_SERVICE
+ WorkLink  ,AWS_SERVICE
+ WorkSpaces  ,AWS_SERVICE
+ X-Ray  ,AWS_SERVICE
+ Amazon Machine Image  ,AWS_SERVICE
+ App Stream  ,AWS_SERVICE
+ Cloud Watch  ,AWS_SERVICE
+ Code Build  ,AWS_SERVICE
+ Code Commit  ,AWS_SERVICE
+ Code Deploy  ,AWS_SERVICE
+ Code Guru  ,AWS_SERVICE
+ Code Pipeline ,AWS_SERVICE
+ Code Star  ,AWS_SERVICE
+ DDB  ,AWS_SERVICE
+ ec2,AWS_SERVICE
+ infrequently accessed,AWS_SERVICE
+ 1-Click  ,AWS_SERVICE
+ Access Manager  ,AWS_SERVICE
+ ALB Application Load Balancer ,AWS_SERVICE
+ AMI,AWS_SERVICE
+ Amplify  ,AWS_SERVICE
+ Analytics  ,AWS_SERVICE
+ API Gateway  ,AWS_SERVICE
+ App Mesh  ,AWS_SERVICE
+ Application Discovery Service  ,AWS_SERVICE
+ AppStream,AWS_SERVICE
+ AppSync  ,AWS_SERVICE
+ Artifact  ,AWS_SERVICE
+ Athena  ,AWS_SERVICE
+ Aurora  ,AWS_SERVICE
+ Auto Scaling  ,AWS_SERVICE
+ AWS Organizations  ,AWS_SERVICE
+ Backup  ,AWS_SERVICE
+ Batch  ,AWS_SERVICE
+ Braket  ,AWS_SERVICE
+ Cassandra Service  ,AWS_SERVICE
+ Certificate Manager  ,AWS_SERVICE
+ Chatbot  ,AWS_SERVICE
+ Cloud Map  ,AWS_SERVICE
+ Cloud9  ,AWS_SERVICE
+ CloudFormation  ,AWS_SERVICE
+ CloudFront  ,AWS_SERVICE
+ CloudHSM  ,AWS_SERVICE
+ CloudSearch  ,AWS_SERVICE
+ CloudTrail  ,AWS_SERVICE
+ CloudWatch,AWS_SERVICE
+ CodeBuild,AWS_SERVICE
+ CodeCommit,AWS_SERVICE
+ CodeDeploy,AWS_SERVICE
+ CodeGuru,AWS_SERVICE
+ CodePipeline,AWS_SERVICE
+ CodeStar,AWS_SERVICE
+ Cognito  ,AWS_SERVICE
+ Comprehend  ,AWS_SERVICE
+ Compute Optimizer  ,AWS_SERVICE
+ Config  ,AWS_SERVICE
+ Container  ,AWS_SERVICE
+ Control Tower  ,AWS_SERVICE
+ Data Exchange  ,AWS_SERVICE
+ Data Pipeline  ,AWS_SERVICE
+ Database Migration Service  ,AWS_SERVICE
+ DataSync  ,AWS_SERVICE
+ DeepLens  ,AWS_SERVICE
+ Detective  ,AWS_SERVICE
+ Device Defender  ,AWS_SERVICE
+ Device Farm  ,AWS_SERVICE
+ Device Management  ,AWS_SERVICE
+ Direct Connect  ,AWS_SERVICE
+ DirectConnect  ,AWS_SERVICE
+ Directory Service  ,AWS_SERVICE
+ DocumentDB  ,AWS_SERVICE
+ Dynamo DB,AWS_SERVICE
+ EC2,AWS_SERVICE
+ EC2 Image Builder  ,AWS_SERVICE
+ ECR  ,AWS_SERVICE
+ ECS  ,AWS_SERVICE
+ EFS  ,AWS_SERVICE
+ EKS  ,AWS_SERVICE
+ Elastic Beanstalk  ,AWS_SERVICE
+ Elastic Transcoder  ,AWS_SERVICE
+ ElastiCache  ,AWS_SERVICE
+ Elasticsearch   ,AWS_SERVICE
+ Elemental   ,AWS_SERVICE
+ EMR  ,AWS_SERVICE
+ Encryption  ,AWS_SERVICE
+ Events  ,AWS_SERVICE
+ Forecast  ,AWS_SERVICE
+ Fraud Detector  ,AWS_SERVICE
+ FreeRTOS  ,AWS_SERVICE
+ FSx  ,AWS_SERVICE
+ GameLift  ,AWS_SERVICE
+ Global Accelerator  ,AWS_SERVICE
+ Glue  ,AWS_SERVICE
+ Greengrass  ,AWS_SERVICE
+ Ground Station  ,AWS_SERVICE
+ Guard Duty  ,AWS_SERVICE
+ GuardDuty  ,AWS_SERVICE
+ IAM  ,AWS_SERVICE
+ Inspector  ,AWS_SERVICE
+ Instance Type  ,AWS_SERVICE
+ IoT Core  ,AWS_SERVICE
+ IQ  ,AWS_SERVICE
+ Kendra  ,AWS_SERVICE
+ Key Management Service  ,AWS_SERVICE
+ Kinesis  ,AWS_SERVICE
+ Kinesis Video Streams  ,AWS_SERVICE
+ Lake Formation  ,AWS_SERVICE
+ Lambda  ,AWS_SERVICE
+ Launch Wizard  ,AWS_SERVICE
+ Lex  ,AWS_SERVICE
+ License Manager  ,AWS_SERVICE
+ Lightsail  ,AWS_SERVICE
+ Machine Learning  ,AWS_SERVICE
+ Macie  ,AWS_SERVICE
+ Managed Blockchain  ,AWS_SERVICE
+ Managed Services  ,AWS_SERVICE
+ MediaConnect  ,AWS_SERVICE
+ MediaConvert  ,AWS_SERVICE
+ MediaLive  ,AWS_SERVICE
+ MediaPackage  ,AWS_SERVICE
+ MediaStore  ,AWS_SERVICE
+ MediaTaylor  ,AWS_SERVICE
+ Metadata Service  ,AWS_SERVICE
+ Migration Hub  ,AWS_SERVICE
+ Mobile Hub  ,AWS_SERVICE
+ Monitoring  ,AWS_SERVICE
+ MSK  ,AWS_SERVICE
+ Neptune  ,AWS_SERVICE
+ OpsWorks  ,AWS_SERVICE
+ Oracle  ,AWS_SERVICE
+ Organizations  ,AWS_SERVICE
+ Outposts  ,AWS_SERVICE
+ Personal Health Dashboard  ,AWS_SERVICE
+ Personalize  ,AWS_SERVICE
+ Polly  ,AWS_SERVICE
+ QLDB  ,AWS_SERVICE
+ QuickSight  ,AWS_SERVICE
+ RDS  ,AWS_SERVICE
+ Redshift  ,AWS_SERVICE
+ Rekognition  ,AWS_SERVICE
+ RoboMaker  ,AWS_SERVICE
+ Route53  ,AWS_SERVICE
+ S3,AWS_SERVICE
+ S3 Glacier  ,AWS_SERVICE
+ SageMaker  ,AWS_SERVICE
+ Secrets Manager  ,AWS_SERVICE
+ Security Hub  ,AWS_SERVICE
+ Server Migration Service  ,AWS_SERVICE
+ Serverless Application Repository  ,AWS_SERVICE
+ Service Catalog  ,AWS_SERVICE
+ Shield  ,AWS_SERVICE
+ Single Sign-On  ,AWS_SERVICE
+ SiteWise  ,AWS_SERVICE
+ Snowball  ,AWS_SERVICE
+ SSO  ,AWS_SERVICE
+ Step Function  ,AWS_SERVICE
+ Storage Gateway  ,AWS_SERVICE
+ Support  ,AWS_SERVICE
+ Systems Manager  ,AWS_SERVICE
+ Tags  ,AWS_SERVICE
+ Textract  ,AWS_SERVICE
+ Things Graph  ,AWS_SERVICE
+ Transcribe  ,AWS_SERVICE
+ Transfer for SFTP  ,AWS_SERVICE
+ Translate  ,AWS_SERVICE
+ Trusted Advisor  ,AWS_SERVICE
+ VPC  ,AWS_SERVICE
+ VPN  ,AWS_SERVICE
+ WAF  ,AWS_SERVICE
+ Well-Architected Tool  ,AWS_SERVICE
+ WorkDocs  ,AWS_SERVICE
+ WorkLink  ,AWS_SERVICE
+ WorkSpaces  ,AWS_SERVICE
+ X-Ray  ,AWS_SERVICE
+ Amazon Machine Image  ,AWS_SERVICE
+ App Stream  ,AWS_SERVICE
+ Cloud Watch  ,AWS_SERVICE
+ Code Build  ,AWS_SERVICE
+ Code Commit  ,AWS_SERVICE
+ Code Deploy  ,AWS_SERVICE
+ Code Guru  ,AWS_SERVICE
+ Code Pipeline ,AWS_SERVICE
+ Code Star  ,AWS_SERVICE
+ DDB  ,AWS_SERVICE
+ ec2,AWS_SERVICE
+ infrequently accessed,AWS_SERVICE

@@ -5,7 +5,10 @@ Parameters:
   AdminEmail:
     Description: Email address for the MIE Administrator
     Type: String
-
+  GITHUBSHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
+    Default: ""
   DevGroupName:
     Type: String
     Description: Name of the developer group
@@ -67,6 +70,12 @@ Parameters:
     AllowedValues:
       - "Yes"
       - "No"
+      
+  EntityRecogniserArn:
+    Description: Custom Comprehend Entity Recogniser Arn (from param store) to use when running entity detection
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: '/mie/comprehend/customAWSEntityRecognizer'
+
   DeployKitchenSinkWorkflow:
     Description: Deploy the Kitchen Sink Workflow which contains all MIE operators.
     Type: String
@@ -101,6 +110,7 @@ Metadata:
       - Label:
           default: System Configuration
         Parameters:
+          - GITHUBSHA
           - AdminEmail
           - MaxConcurrentWorkflows
       - Label:
@@ -1132,6 +1142,7 @@ Resources:
       Parameters:
         DataplaneTableName: !Ref DataplaneTable
         DataplaneBucketName: !Ref Dataplane
+        GITHUBSHA: !Ref GITHUBSHA
         UserPoolArn: !GetAtt MieUserPool.Arn
         DeploymentPackageBucket: !FindInMap ["SourceCode", "General", "S3Bucket"]
         DeploymentPackageKey:
@@ -1161,6 +1172,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         DynamoStreamArn:
           Fn::GetAtt:
             - DataplaneTable
@@ -1185,6 +1197,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         UserPoolArn: !GetAtt MieUserPool.Arn
         StageExecutionQueueUrl: !Ref StageExecutionQueue
         StageExecutionRole: !GetAtt StepFunctionRole.Arn
@@ -1253,6 +1266,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1260,6 +1274,7 @@ Resources:
         DataPlaneEndpoint: !GetAtt MediaInsightsDataplaneApiStack.Outputs.APIHandlerName
         DataPlaneHandlerArn: !GetAtt MediaInsightsDataplaneApiStack.Outputs.APIHandlerArn
         DataPlaneBucket: !Ref Dataplane
+        entityRecognizerArn: !Ref EntityRecogniserArn
         MediaInsightsEnginePython37Layer: !Ref MediaInsightsEnginePython37Layer
         MediaInsightsEnginePython36Layer: !Ref MediaInsightsEnginePython36Layer
 
@@ -1282,6 +1297,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1313,6 +1329,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1362,6 +1379,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1387,6 +1405,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1412,6 +1431,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         WorkflowCustomResourceArn:
           Fn::GetAtt:
             - MediaInsightsWorkflowApi
@@ -1455,6 +1475,7 @@ Resources:
           ],
         ]
       Parameters:
+        GITHUBSHA: !Ref GITHUBSHA
         DataplaneEndpoint: !GetAtt MediaInsightsDataplaneApiStack.Outputs.EndpointURL
         WorkflowEndpoint: !GetAtt MediaInsightsWorkflowApi.Outputs.EndpointURL
         ElasticEndpoint: !GetAtt Analytics.Outputs.ElasticUrl

@@ -1,0 +1,92 @@
+Okay, hello Cloud Gurus
+and welcome to this lecture.
+In this lecture, we're going to look at AWS WAF,
+or web application firewall.
+So WAF is a web application firewall
+that allows you to monitor the HTTP and HTTPS requests
+that are forwarded to Amazon CloudFront,
+an application load balancer, or API Gateway.
+And essentially it allows you to control access
+to your content.
+So with HTTP and HTTPS that's happening
+at the application layer.
+Sometimes this is referred to as layer seven
+in the OSI model.
+So a web application firewall
+is a layer seven aware firewall.
+And it can see things like query string parameters.
+It can see the actual information that you're sending
+to your web servers.
+So you might be wondering what a query string parameter is?
+This is a good example of one.
+You see them all the time when you use the internet.
+So you've got your web address in here,
+and it ends with your top-level domain name,
+then you've got this question mark,
+and then you have some variables.
+And this is what's called a query string parameter.
+It's passing variables back to your web server.
+So this variable is called id and it's equal to 1001.
+This variable is the name and it's equal to ryan.
+So your web application firewall can actually
+see down into the layer seven
+of this query string parameter,
+whereas a physical hardware file would only be able to go
+up to layer four.
+So web application firewalls are a lot more secure.
+They can see a lot more information than a typical firewall.
+So you can configure conditions, such as what IP addresses
+are allowed to make this request,
+or what query string parameters need to be passed
+for the request to be allowed.
+And then the application load balancer, or CloudFront,
+or API Gateway will either allow this content
+to be received, or give a HTTP 403 status code.
+So at its most basic level, AWS WAF
+allows three different types of behavior.
+Behavior number one, allow all requests
+except the ones that you specify.
+Behavior number two, block all requests
+except the ones that you specify.
+Or number three is sort of a passive mode,
+which is just where it's going to count the requests
+that match the properties that you specify.
+So in terms of the extra protection that WAF provides,
+it protects against web attacks
+using conditions that you specify.
+And you can define conditions by using characteristics
+of web requests such as, the IP address
+that it originates from,
+the country that requests originate from,
+and that's a really, really popular exam question.
+You might have an embargo against some country
+and you need to block their access to your website.
+How do you do this?
+Well using AWS WAF is definitely one of the correct answers.
+Values in request headers.
+Strings that appear in requests.
+Either specific strings,
+or strings that match regular expressions.
+The lengths of the request.
+And then WAF can also detect things like SQL code
+that is likely to be malicious.
+So this will be things like SQL injections.
+As well as the presence of a script
+that is likely to be malicious.
+This is sometimes known as cross-site scripting.
+So on to my exams tips.
+Just remember that you're gonna be given
+a whole buncha different scenarios
+and you'll be asked to block,
+how to block malicious IP addresses, or perhaps
+how to prevent against SQL attacks, or SQL injections,
+or cross-site scripting, or block individual countries,
+well you wanna use AWS WAF.
+You can also use network ACLs
+to block malicious IP addresses.
+And we're gonna cover this off in more detail
+in the VPC section of the course.
+So that is it for this lecture everyone.
+If you have any questions, please let me know.
+If not, feel free to move on to the next lecture.
+Thank you.

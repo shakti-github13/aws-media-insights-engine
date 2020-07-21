@@ -1,0 +1,269 @@
+Okay, hello Cloud Gurus
+and welcome to this lecture.
+In this lecture, we're going to look at EFS.
+So what is EFS?
+Well EFS stands for Elastic File System
+and it's a file storage service
+for Amazon's Elastic Compute Cloud or EC2 instances.
+So it's similar to EBS, except where you've got EBS,
+you can only mount your virtual disk to one EC2 instance
+and that's just the way it works.
+You cannot have an EC2 instance, two EC2 instances
+sharing an EBS volume.
+However, you can have them sharing an EFS volume.
+So EFS is an easy way to use and provide a simple interface
+that allows you to create and configure file systems
+quickly and easily and with the EFS, storage capacity
+is elastic, growing and shrinking automatically
+as you add and remove files so your applications have
+the storage they need when they need it.
+So it is actually really cool.
+Basically if you provision an EFS instance,
+it will just grow automatically so you could put like
+one terabyte file on there and then add another terabyte,
+you don't need to pre-provision storage
+like you do with EBS.
+So EFS is a way, it's great for basically file servers,
+it's a great way to share files
+between different EC2 instances.
+So as always, the best way to learn EFS is to go in
+and start using it.
+What we're gonna do is we're gonna create
+two little EC2 instances,
+we're gonna run a bootstrap script on them
+to install some tools as well as Apache
+and then what we're gonna do is we're going to go
+and mount this, our var dub-dub-dub HTML directory
+to an EFS mount point and then that way,
+we only need one copy of our website or our website
+will be stored on EFS and when we go and update
+or make changes to it, we're just that those changes
+are replicated automatically across all our EC2 instances.
+So if you've got the time, please join me
+in the AWS console.
+Okay, so here I am in the AWS Management Console
+and currently in the London region.
+Let's go ahead and provision our EFS clusters,
+you'll find EFS under storage and we're gonna go in
+and provision our EFS file system.
+So let's go ahead and create our file system.
+In here, we can see the three different availability zones
+it's going to be spread across, it is gonna go
+into our default security group within our default VPC
+and you will need to remember that for a bit later.
+Let's go ahead and hit Next and in here,
+we can add in our tags, we don't need to add any in there.
+This is quite new, enable lifecycle management.
+So just like how we have lifecycle policies on S3,
+we also have this with EFS and essentially,
+you've got different policies in here.
+So if your files haven't been access in the last 14 days
+or 30 days or 60 days or et cetera, et cetera,
+it will automatically move them over to EFS
+infrequently access storage class, which is cheaper.
+I'm not gonna do that because we're gonna delete
+this almost straight away.
+In here we've got our throughput mode,
+we can just use bursting,
+we don't need provision throughput, same with performance,
+it's just gonna be a single web page
+that we're putting on here.
+So we're gonna do general purpose and not max I/O.
+And I am gonna enable encryption of my data
+and I'm just going to use this KMS master key,
+it's gonna make one for me called Elastic File System.
+Let's go ahead and hit Next and we'll go ahead
+and hit Create File System.
+So that can take about four or five minutes to go in
+and create your file system, you will see it in here
+that it's the mount target state is creating.
+This will change to available in about four or five minutes.
+Let's go over to our EC2 instances, I'm gonna go in
+and provision our EC2 instances, so let's go ahead
+and launch our instances.
+We're gonna do an Amazon Linux 2 AMI, gonna do a t2micro
+and I'm going to change the number of instances
+in here to two.
+And then I'm gonna give it this bootstrap script.
+So this is the bootstrap script in here.
+Essentially what we're doing is running a yum update,
+we're installing Apache, we're starting the Apache service,
+we're making sure Apache comes back on if
+our EC2 instance restarts and then we're installing
+the Amazon EFS utils tool and that will allow us
+to mount it a bit later to, our file system
+to our EC2 instances.
+So grab that, copy it into your clipboard
+and then just paste it in here.
+And then we'll go ahead and hit Next to add our storage,
+I'm gonna leave everything else as default,
+I'm going to drop this into my web DMZ security group
+and then we're gonna go ahead and launch it
+and make sure you have access to your key pair
+because you will need to SSH into these EC2 instances.
+They're now launching.
+While we're waiting for those to launch,
+let's go over to our security group.
+So if you remember, we provisioned our EFS file system
+into our default security group.
+And EFS is going to or our web servers
+are going to communicate to our file system
+using the NFS protocol.
+So we actually need to open this up
+on our inbound firewall rules.
+So let's go in here and hit edit and you can see
+I've actually already got this one in but we may as well
+just add it in manually.
+So you just click in here, scroll down to NFS
+and then it's on port 2049 and to do that,
+you just type in SG and then select your web DMZ
+and go ahead and hit save and then you should be able
+to see that you've got your NFS firewall rule in here.
+So it's allowing NFS protocol
+into our default security group from our web servers.
+And if you don't do this, the lab isn't gonna work
+so don't forget to do this.
+Let's go back over to our EFS and see if it's up online
+to our Elastic File System.
+See in here that my mount target states
+are now all available, so it is good to go.
+Before we go in and mount this, let's go and open up.
+Let's go over to EC2 and we wanna grab
+the public IP addresses of our two running instances.
+So I'm going to select this one first,
+I'm gonna copy this into my clipboard.
+I'm gonna type SSH EC2 and then hyphen user and then at
+and then paste my public IP in there and then it's called
+my London key pair and just gonna hit yes
+and then I'm gonna elevate my privileges to root,
+gonna clear the screen.
+Let's go over to our var dub-dub-dub HTML directory
+and just make sure it exists.
+If it exists, that means that Apache has been installed,
+so we're all good to go.
+Then you just need to go back a directory,
+so go back to your dub-dub-dub directory
+and go ahead and clear the screen.
+Let's grab our second IP address.
+So the second one is this one here and we're gonna do
+exactly the same steps, so just copy this
+into our clipboard, go back over and then need to go back
+over to my other tab and then in here,
+I'm going to type in SSH EC2 and then hyphen user
+and then at and then enter in my public IP address minus i
+and then it's my London key pair.
+Again, type yes, elevate your privileges to root
+so sudo su, let's clear the screen just to make it easier
+to see, then we're gonna go over to our cd var dub-dub-dub
+and then HTML directory, make sure Apache is installed
+which it is and then go back a directory,
+it's very important that you always go back a directory
+to our dub-dub-dub.
+So we've got our two tabs open, both in our dub-dub-dub
+and we've got separate internal IP addresses.
+Let's go back over to our browser and we're gonna go back
+over to EFS and we're going to mount our Elastic File System
+to our EC2 instances.
+Amazon make this very easy for us, all we need to do
+is scroll down to here and click
+on the mount instructions from a local VPC.
+That will then give us the command.
+We've already ran this command in the bootstrap scripts,
+that has already been done.
+And then what we need to do is go down here,
+there's two different commands here using the mount helper.
+This one will do it and it means that there will be
+no encryption in transit.
+We don't want that, we wanna make sure our files
+are encrypted in transit because we've also got encryption
+at rest turned on.
+So we'll wanna use the TLS command in here.
+You won't need sudo 'cause we're already at root,
+so just copy that into your clipboard, go back over
+to your browser and click on one of the tabs.
+gonna paste it in here but we don't want it to go
+to the EFS directory, we want it to go
+to our var dub-dub-dub and then HTML directory, so HTML.
+And then when you hit enter, you can take
+like a few seconds, if it hangs for more than a minute,
+it means your security groups aren't working.
+That's typically what it is.
+Again, I'm gonna paste the same tab, the same command
+into the other tab and we're gonna change it
+to my var dub-dub-dub and then HTML directory.
+And then in here, I'm gonna type ls,
+so I can see my HTML directory, then go into it
+and then type ls, there's nothing in there.
+So let's create a file.
+So we're gonna do echo, I'm gonna make a little web page
+so HTML and then do our body and we'll do a header
+and we'll say, Hello EFS Gurus.
+And then I'm going to end my header and the body
+and then we're going to end the HTML.
+So end HTML, close out our quotations
+and then we're going to output this
+to our index, then .html.
+And then if we type in ls, that's created the file,
+if we type cat index.html, you can see the contents
+of the file in there.
+We go back over to our other tab, type in ls,
+we can see our HTML directory, if we go
+into the HTML directory and type ls, we can see index.html.
+If we cat it index.html,
+you can see the contents of the file.
+Now we can go in on this EC2 instance
+and we could change the file.
+So we could go nano index.html and then instead
+of saying Hello EFS Gurus, we ended Keep Being Awesome
+Cloud Gurus and then I'm just gonna hit Control + X, yes
+and then hit enter.
+I'm gonna change my tab over to my other EC2 instance
+and if I do cat index.html, you can see that
+they're all reading from the same file so it's all
+on the same file system.
+So you make a change on one, that change is automatically,
+replicated out to our other web servers.
+You can go and visit the website we just created
+by going to the public IP address
+and you can check it out there, I'm not going to.
+What we are gonna do is, it can take a while to delete
+your file systems in EFS so I'm gonna go in
+and just terminate the EC2 instances first.
+So we'll just do that by going up here, Actions,
+Instance State and then we'll go over and hit Terminate
+and hit Yes, Terminate and then we'll go over to EFS
+and then we're gonna go into this EFS, Elastic File System
+and to delete the file system, you just grab the name
+of the file system in here, copy it into your clipboard
+and then paste it in here and it says
+it's a destructive action that cannot be undone
+so let's be destructive in our AWS environment.
+So that is it, it's really really simple.
+EFS is a way of having common file systems
+or storage using NFS between your different EC2 instances,
+very easy to set up and get going and then you don't need
+to worry about syncing files between your EC2 instances
+'cause they're all on the same file system.
+So let's go and have a look at my exam tips.
+So what are my exam tips?
+Well, EFS supports the Network File System version four
+or NFSv4 protocol.
+With the EFS you only pay for the storage that you use,
+there's no pre-provisioning required, it's not like EBS
+where we have to say, hey, I want an eight gig EBS volume,
+we basically just pay as we go.
+It can scale up to the petabytes
+and it can support thousands of concurrent NFS connections.
+And then data is stored across multiple availability zones
+within a region.
+And in terms of the consistency model,
+it's always read after write consistency.
+So you're getting towards the end of this section
+of the course, in the next lecture,
+we're going to look at FSx for Windows and FSx for Lustre,
+we're then going to move on to EC2 placement groups,
+then look at web application firewalls and then finally,
+we will move on to the summary
+of this section of the course.
+So if you've got the time,
+please join me in the next lecture, thank you.

@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "Media Insights Engine - S3 Consumer stack"
 
 Parameters:
+  GITHUBSHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
+    Default: ""
   AnalyticsStreamArn:
     Description: "Arn of the MIE kinesis data stream"
     Type: String

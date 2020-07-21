@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: "Media Insights Engine - Analytics Streaming pipeline from the Dataplane DynamoDB Stream"
 
 Parameters:
+  GITHUBSHA:
+    Type: "String"
+    Description: "SHA of GitHub Commit"
+    Default: ""
   KinesisShardCount:
     Type: Number
     Default: 1
